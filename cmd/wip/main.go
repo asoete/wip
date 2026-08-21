@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+// flags
+var listenAddress string
+var listenPort int
+
 var ctlAddress string
 var ctlMux = http.NewServeMux()
 
@@ -31,6 +35,11 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
+	flag.StringVar(&listenAddress, "a", "127.0.0.1", "shorthand: bind to this address")
+	flag.StringVar(&listenAddress, "address", "127.0.0.1", "bind to this address")
+
+	flag.IntVar(&listenPort, "p", 8080, "shorthand: listen on this port")
+	flag.IntVar(&listenPort, "port", 8080, "listen on this port")
 
 	// Control flags
 	flag.StringVar(&ctlAddress, "ctl-address", "127.0.0.1:8100", " Service control (ctl) endpoints")
@@ -55,4 +64,9 @@ func main() {
 		slog.Debug("[CTL]", "X-WiP-Ctl-Token", tokenMuxToken)
 		log.Fatal(http.ListenAndServe(ctlAddress, &tokenMux{ctlMux}))
 	}()
+
+	// Start main webserver
+	webAddr := fmt.Sprintf("%s:%d", listenAddress, listenPort)
+	slog.Info("[WEB] start web service", "address", webAddr)
+	log.Fatal(http.ListenAndServe(webAddr, nil))
 }
