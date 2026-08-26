@@ -1,18 +1,12 @@
-SOURCES ?= $(shell find -type f -name "*.go")
+# -- General
+.DEFAULT_GOAL := compile
 
-GO := /usr/bin/go
-GO_FLAGS := CGO_ENABLED=0
 
 PORT := 8080
 CTL_PORT := 8100
 CTL_TOKEN := let-the-dev-times-roll 123
 
-.PHONY: all
-all: bin/wip
 
-# Compile a production build (excludes /dev/* and /test-fixtures/* endpoints)
-bin/wip: $(SOURCES) Makefile
-	$(GO_FLAGS) $(GO) build -o $@ cmd/wip/*.go
 
 # Compile and run a DEV build
 .PHONY: run
