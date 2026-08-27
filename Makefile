@@ -4,6 +4,8 @@
 # -- MAIN Config
 
 WEB.ADDRESS := 127.0.0.1:8080
+DB.SQLITE_FILE := data/work-in-peace.sqlite
+DB.DSN := sqlite:$(DB.SQLITE_FILE)
 
 # -- CONTROL Config
 
