@@ -33,7 +33,19 @@ function main() {
 	test $VERBOSITY -ge $LVL_DEBUG && printf "\e[37m sources: %s\e[0m\n" "${sources[@]}"
 
 	for file in "${sources[@]}" ; do
-		migrate_single_file "$file"
+
+		if [ -d "$file" ] ; then
+
+			printf "\e[33m[W] detected a directory as input ($file). Scanning for SQL files... \e[0m\n" 1>&2
+
+			for subfile in $(find "${default_migration_source_dir}" -iname "${sql_file_pattern}" | sort -V) ; do
+				migrate_single_file "$subfile"
+			done
+
+		else
+
+			migrate_single_file "$file"
+		fi
 	done
 
 }
