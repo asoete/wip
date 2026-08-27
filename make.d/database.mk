@@ -7,7 +7,7 @@ db: db.create db.migrate
 db.create: | $(DB.SQLITE_FILE)
 
 db.migrate: | $(DB.SQLITE_FILE)
-	libexec/db.migrate.sh
+	DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh
 
 $(DB.SQLITE_FILE): sql/schema/20260825145000_create-table-migrations.sql
 	sqlite3 $(DB.SQLITE_FILE) < sql/schema/20260825145000_create-table-migrations.sql
