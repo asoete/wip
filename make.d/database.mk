@@ -13,4 +13,8 @@ $(DB.SQLITE_FILE): sql/schema/20260825145000_create-table-migrations.sql
 	sqlite3 $(DB.SQLITE_FILE) < sql/schema/20260825145000_create-table-migrations.sql
 
 db.delete:
-	rm -v $(DB.SQLITE_FILE) || true
+	@printf ">_ rm -v $(DB.SQLITE_FILE)\n"
+	@read -p "are you sure (y|yes|NO): " ; \
+		printf "$$REPLY" | grep -qEi '^(y|yes)$$' \
+		&& { rm -v $(DB.SQLITE_FILE) || true ; } \
+		|| printf ' `-> abort...\n'
