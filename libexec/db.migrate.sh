@@ -86,8 +86,6 @@ function sqlite_run() {
 
 	test -z "${1:-}" && die "db.migrate.sh: sqlite_run(<query> ,[<params>...]): no query provided"
 
-	test -f "${DB_FILE}" || die 'db.migrate.sh: sqlite(<query> ,[<params>...]): DB_FILE not found: `%s`.\n(Run `make db.create` first... ?)' "${DB_FILE}"
-
 	printf "$@" | sqlite || die "sqlite_run(<query>, [<params>...]) failed"
 }
 
