@@ -46,7 +46,9 @@ make db.migrate
 
 See [Migrations](#Migrations) for more info about `make db.migrate`.
 
-### [Migrations](Migrations)
+### Migrations
+
+#### Development
 
 `make db.create` is a simple wrapper / _make interface_ to `libexec/db.migrate.sh`.
 
@@ -82,6 +84,57 @@ make db.migrate
 	#  [  NOOP  ]  sql/schema/20260825145522_create-table-user_channels.sql     2026-08-27 16:19:26
 ```
 
+#### Production
+
+A problem arises when trying to bring these migration files into production. Do
+we ship a makefile and a bunch of loose SQL files? Where do we store this data? ~~`/usr/share/wip`~~?
+
+`tools/bundle-migrations.sh` to the rescue!
+
+From the tool itself:
+> This tools ingests all provided migration files and spits out a single
+> bash-script.
+> This bash script is idempotent an can thus be executed as much as you
+> want. For example, at each service start...
+
+The created script will:
+1. Check if the provided database is initialized
+1a. If not: initialize (by creating the `migrations` table 
+2. Run all bundled SQL files (in order)
+
+As usual, a make wapper is provided: `make rpm/migrate.sh`
+
+```bash
+# 1. Create migration bundle from sql files
+make rpm/migrate.sh
+	# tools/bundle-migrations.sh \
+	#       sql/schema/20260825145000_create-table-migrations.sql \
+	#       sql/schema/20260825145030_create-table-users.sql \
+	#       sql/schema/20260825145205_create-table-alarms.sql \
+	#       sql/schema/20260825145411_create-table-ntfy_channels.sql \
+	#       sql/schema/20260825145522_create-table-user_channels.sql \
+	#       > rpm/migrate.sh
+
+# 2. Run migration script for the first time
+sh rpm/migrate.sh /tmp/db.sqlite
+	#  *** warning: new (uninitialized) database provided: '/tmp/db.sqlite'
+	#  *** creating new database: '/tmp/db.sqlite' and populating with 'sql/schema/20260825145000_create-table-migrations.sql'
+	#  *** init database '/tmp/db.sqlite' completed
+	#  *** -rw-r--r--. 1 user user 16384 28 aug 17:22 /tmp/db.sqlite
+	# sql/schema/20260825145000_create-table-migrations.sql           [  DONE  ] 2026-08-28 15:22:21
+	# sql/schema/20260825145030_create-table-users.sql                [MIGRATED] 2026-08-28 17:22:21
+	# sql/schema/20260825145205_create-table-alarms.sql               [MIGRATED] 2026-08-28 17:22:21
+	# sql/schema/20260825145411_create-table-ntfy_channels.sql        [MIGRATED] 2026-08-28 17:22:21
+	# sql/schema/20260825145522_create-table-user_channels.sql        [MIGRATED] 2026-08-28 17:22:21
+	
+# 2. Run migration script (many) times again
+sh rpm/migrate.sh /tmp/db.sqlite
+	# sql/schema/20260825145000_create-table-migrations.sql           [  DONE  ] 2026-08-28 15:22:21
+	# sql/schema/20260825145030_create-table-users.sql                [  DONE  ] 2026-08-28 15:22:21
+	# sql/schema/20260825145205_create-table-alarms.sql               [  DONE  ] 2026-08-28 15:22:21
+	# sql/schema/20260825145411_create-table-ntfy_channels.sql        [  DONE  ] 2026-08-28 15:22:21
+	# sql/schema/20260825145522_create-table-user_channels.sql        [  DONE  ] 2026-08-28 15:22:21
+```
 
 ## Delete / Destroy database
 

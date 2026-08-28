@@ -18,3 +18,14 @@ db.delete:
 		printf "$$REPLY" | grep -qEi '^(y|yes)$$' \
 		&& { rm -v $(DB.SQLITE_FILE) || true ; } \
 		|| printf ' `-> abort...\n'
+
+# .PHONY: rpm.migrations
+# rpm.migrations: rpm/migrate.sh
+
+rpm/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | rpm
+	tools/bundle-migrations.sh \
+		$(DB.SCHEMA_SOURCES) \
+		> $@
+
+rpm:
+	mkdir rpm
