@@ -37,14 +37,14 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	flag.StringVar(&listenAddress, "a", "127.0.0.1", "shorthand: bind to this address")
-	flag.StringVar(&listenAddress, "address", "127.0.0.1", "bind to this address")
+	// Web service
+	flag.StringVar(&listenAddress, "web.address", "127.0.0.1:8080", "bind to this address")
 
 	// Database
 	flag.StringVar(&dbDSN, "db.dsn", "sqlite::memory:", "use this database")
 
-	flag.IntVar(&listenPort, "p", 8080, "shorthand: listen on this port")
-	flag.IntVar(&listenPort, "port", 8080, "listen on this port")
+	// Control service
+	flag.StringVar(&ctlAddress, "ctl.address", "127.0.0.1:8100", " service control (ctl) endpoints")
 
 	// Control flags
 	flag.StringVar(&ctlAddress, "ctl-address", "127.0.0.1:8100", " Service control (ctl) endpoints")
@@ -65,13 +65,12 @@ func main() {
 
 	// Start (separate) server to listen for control commands
 	go func() {
-		slog.Info("[CTL] start control service", "address", ctlAddress)
+		slog.Info("[CTL] start control service", "--ctl.address", ctlAddress)
 		slog.Debug("[CTL]", "X-WiP-Ctl-Token", tokenMuxToken)
 		log.Fatal(http.ListenAndServe(ctlAddress, &tokenMux{ctlMux}))
 	}()
 
 	// Start main webserver
-	webAddr := fmt.Sprintf("%s:%d", listenAddress, listenPort)
-	slog.Info("[WEB] start web service", "address", webAddr)
-	log.Fatal(http.ListenAndServe(webAddr, nil))
+	slog.Info("[WEB] start web service", "--web.address", listenAddress)
+	log.Fatal(http.ListenAndServe(listenAddress, nil))
 }
