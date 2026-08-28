@@ -13,6 +13,8 @@ import (
 var listenAddress string
 var listenPort int
 
+var dbDSN string
+
 var ctlAddress string
 var ctlMux = http.NewServeMux()
 
@@ -37,6 +39,9 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func init() {
 	flag.StringVar(&listenAddress, "a", "127.0.0.1", "shorthand: bind to this address")
 	flag.StringVar(&listenAddress, "address", "127.0.0.1", "bind to this address")
+
+	// Database
+	flag.StringVar(&dbDSN, "db.dsn", "sqlite::memory:", "use this database")
 
 	flag.IntVar(&listenPort, "p", 8080, "shorthand: listen on this port")
 	flag.IntVar(&listenPort, "port", 8080, "listen on this port")
