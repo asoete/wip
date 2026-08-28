@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,6 +22,9 @@ var ctlMux = http.NewServeMux()
 var tokenMuxTokenHeader = "X-WiP-Ctl-Token"
 var tokenMuxToken = "wip-ctl-token-please-change!"
 
+var dumpConfig = false
+
+// types
 type tokenMux struct {
 	handler http.Handler
 }
@@ -46,8 +50,8 @@ func init() {
 	// Control service
 	flag.StringVar(&ctlAddress, "ctl.address", "127.0.0.1:8100", " service control (ctl) endpoints")
 
-	// Control flags
-	flag.StringVar(&ctlAddress, "ctl-address", "127.0.0.1:8100", " Service control (ctl) endpoints")
+	// Misc options
+	flag.BoolVar(&dumpConfig, "dump-config", false, "dump the active config and exit")
 }
 
 func main() {
@@ -62,6 +66,28 @@ func main() {
 
 	// Handle command line parameters
 	flag.Parse()
+
+	if dumpConfig || slog.Default().Handler().Enabled(context.Background(), slog.LevelDebug) {
+
+		if !dumpConfig {
+			fmt.Printf("== DEBUG: dump config =====================================\n")
+		}
+
+		fmt.Printf("    --web.address = %s\n", listenAddress)
+
+		fmt.Printf("         --db.dsn = %s\n", dbDSN)
+
+		fmt.Printf("    --ctl.address = %s\n", ctlAddress)
+		fmt.Printf("  X-WiP-Ctl-Token = %s\n", tokenMuxToken)
+
+		if !dumpConfig {
+			fmt.Printf("===========================================================\n")
+		}
+
+		if dumpConfig {
+			os.Exit(0)
+		}
+	}
 
 	// Start (separate) server to listen for control commands
 	go func() {
