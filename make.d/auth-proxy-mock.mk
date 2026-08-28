@@ -45,3 +45,26 @@ apm.start-server.usage.options:
 		printf ' \t `APM.REMOTE_USER` \t `$$USER` \t `auth-proxy-mock --remote-user=...` \t Inject this remote user in the HTTP request (header) \t\n' ; \
 		printf ' \t `APM.SSO_SUB` \t `<md5sum($$USER) | as-uuid>` \t `auth-proxy-mock --sso-sub=...` \t Inject this sso sub in the HTTP request (header) \t\n' ; \
 	} | column -t -s $$'\t' -o '|' | $(COLORIZE)
+
+.PHONY: apm.docs
+apm.docs: docs/auth-proxy-mock.md
+docs/auth-proxy-mock.md: make.d/auth-proxy-mock.mk bin/auth-proxy-mock | /usr/bin/sed /usr/bin/sponge
+	@printf "$@: inject block: <!-- make apm.start-server.usage.options -->\n"
+	@{ \
+		sed -n '1,/^<!-- START make apm.start-server.usage.options -->$$/ p' $@ ; \
+		$(MAKE_EMBED) apm.start-server.usage.options ; \
+		sed -n '/^<!-- END make apm.start-server.usage.options -->$$/,$$ p' $@ ; \
+	} | sponge $@
+	@
+	@printf "$@: inject block: <!-- bin/auth-proxy-mock --help -->\n"
+	@{ \
+		sed -n '1,/^<!-- START bin\/auth-proxy-mock --help -->$$/ p' $@ ; \
+		printf '```bash\n' ; \
+		printf './bin/auth-proxy-mock --help\n' ; \
+		./bin/auth-proxy-mock --help 2>&1 | sed 's/^/\t# /'; \
+		printf '```\n' ; \
+		sed -n '/^<!-- END bin\/auth-proxy-mock --help -->$$/,$$ p' $@ ; \
+	} | sponge $@
+
+	git status --short docs/auth-proxy-mock.md
+	git diff docs/auth-proxy-mock.md
