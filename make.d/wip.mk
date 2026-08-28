@@ -1,4 +1,4 @@
-WIP_SOURCES ?= $(shell find -type f -name "*.go" -not -path "cmd/auth-proxy-mock")
+WIP_SOURCES ?= $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
 # SOURCES += Makefile
 # SOURCES += $(shell find make.d/ -type f -name "*.mk")
 
