@@ -37,7 +37,7 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	abort(w, http.StatusUnauthorized, "invalid token")
+	abort(w, http.StatusUnauthorized, "invalid token (host=%s ; path=%s ; user=%s)", r.URL.Host, r.URL.Path, r.URL.User)
 }
 
 func init() {
