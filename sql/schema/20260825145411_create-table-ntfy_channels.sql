@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS ntfy_channels (
+	channel_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	url TEXT NOT NULL
+);
+
+INSERT INTO migrations (file, date)
+VALUES ('sql/schema/20260825145411_create-table-ntfy_channels.sql', datetime('now'))
+RETURNING datetime(date, 'localtime');
