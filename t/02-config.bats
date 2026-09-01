@@ -81,6 +81,27 @@ load "lib/diff.bash"
 
 # ---------------------------------------------------------------------------- #
 
+@test "wip/config: --pidfile path" {
+
+  flag="-pidfile"
+
+  # Test --help
+  run -0 ./bin/wip --help
+
+  [[ "${lines[@]}" = *"-pidfile path"* ]]
+
+  # Test default value (-> empty)
+  run bats_pipe -0 ./bin/wip --dump-config \| grep -qE -- '--pidfile = \s*$ '
+
+  run -0 ./bin/wip --dump-config -${flag} "/dev/shh/wip/wip.sqlite"
+  [[ "${lines[@]}" = *"-${flag} = "/dev/shh/wip/wip.sqlite""* ]]
+
+  run -2 ./bin/wip --dump-config -${flag}
+}
+
+
+# ---------------------------------------------------------------------------- #
+
 @test "wip/config: X-WiP-Ctl-Token" {
 
   # Test default value
