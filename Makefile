@@ -16,5 +16,7 @@ CTL.ADDRESS := 127.0.0.1:8100
 CTL.TOKEN := let-the-dev-times-roll
 CTL.TOKEN_HEADER := X-WiP-Ctl-Token: $(CTL.TOKEN)
 
+# -- Building
+WIP.SOURCES ?= $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
 
 include make.d/*.mk

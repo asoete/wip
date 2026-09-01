@@ -45,17 +45,17 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 	// Web service
-	flag.StringVar(&listenAddress, "web.address", "127.0.0.1:8080", "bind to this address")
+	flag.StringVar(&listenAddress, "web.address", "127.0.0.1:8080", "bind to this `address`")
 
 	// Database
-	flag.StringVar(&dbDSN, "db.dsn", "sqlite::memory:", "use this database")
+	flag.StringVar(&dbDSN, "db.dsn", "sqlite::memory:", "connect to this `dsn`")
 
 	// Control service
-	flag.StringVar(&ctlAddress, "ctl.address", "127.0.0.1:8100", " service control (ctl) endpoints")
+	flag.StringVar(&ctlAddress, "ctl.address", "127.0.0.1:8100", "bind service control to this `address`")
 
 	// Misc options
 	flag.BoolVar(&dumpConfig, "dump-config", false, "dump the active config and exit")
-	flag.StringVar(&pidfile, "pidfile", "", "write the WiP service pid to this file")
+	flag.StringVar(&pidfile, "pidfile", "", "write the WiP service pid to this `path`")
 }
 
 func main() {
