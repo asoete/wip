@@ -35,7 +35,7 @@ func exitHandler(w http.ResponseWriter, r *http.Request) {
 	// return message to HTTP request
 	fmt.Fprint(w, "Shutting down in 100ms\n")
 
-	// Allow request to return: async exit
+	// Allow request to return (body to write and close) -> async exit
 	go func() {
 		time.Sleep(delay)
 		slog.Warn("[CTL] shutting down NOW")

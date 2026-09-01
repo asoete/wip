@@ -8,6 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strconv"
 )
 
 // flags
@@ -23,6 +25,7 @@ var tokenMuxTokenHeader = "X-WiP-Ctl-Token"
 var tokenMuxToken = "wip-ctl-token-please-change!"
 
 var dumpConfig = false
+var pidfile string
 
 // types
 type tokenMux struct {
@@ -52,6 +55,7 @@ func init() {
 
 	// Misc options
 	flag.BoolVar(&dumpConfig, "dump-config", false, "dump the active config and exit")
+	flag.StringVar(&pidfile, "pidfile", "", "write the WiP service pid to this file")
 }
 
 func main() {
@@ -74,6 +78,7 @@ func main() {
 		}
 
 		fmt.Printf("    --web.address = %s\n", listenAddress)
+		fmt.Printf("        --pidfile = %s\n", pidfile)
 
 		fmt.Printf("         --db.dsn = %s\n", dbDSN)
 
@@ -86,6 +91,24 @@ func main() {
 
 		if dumpConfig {
 			os.Exit(0)
+		}
+	}
+
+	if pidfile != "" {
+
+		slog.Info("detected --pidfile: write pidfile", "path", pidfile)
+
+		// TODO: add plumbing to handle os.Exit, interupts and sigterms from other workers
+		defer os.Remove(pidfile)
+
+		err := os.MkdirAll(filepath.Dir(pidfile), os.ModePerm)
+		if err != nil {
+			log.Fatal("create pidfile (parent) dir failed:", err)
+		}
+
+		err = os.WriteFile(pidfile, []byte(strconv.Itoa(os.Getpid())), 0644)
+		if err != nil {
+			log.Fatal("create pidfile failed:", err)
 		}
 	}
 

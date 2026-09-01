@@ -10,6 +10,7 @@ run: fmt
 		$(GO_FLAGS) $(GO) run -tags debug cmd/wip/*.go \
 			--ctl.address $(CTL.ADDRESS) \
 			--web.address $(WEB.ADDRESS) \
+			--pidfile $(WIP.PIDFILE) \
 			--db.dsn $(DB.DSN) \
 
 # Call a Control endpoint with all necessary parameters and flags
@@ -39,7 +40,7 @@ wip.server-loop.start: /usr/bin/inotifywait
 .PHONY: wip.server-killer.start
 wip.server-killer.start: | tools/notifywait.sh
 	./tools/notifywait.sh \
-		'$(MAKE) --no-print-directory wip.server.kill ; touch ../playwright/tests/main-page.spec.ts ; sleep 1' \
+		'$(MAKE) --no-print-directory wip.server.kill' \
 		$(shell find * -maxdepth 0 -not -iname 'bin')
 
 # Start all required services for "a good development experience" (TM)
