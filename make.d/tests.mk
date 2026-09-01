@@ -1,18 +1,20 @@
 TESTS_DIR := t
 TESTS := $(TESTS_DIR)/$(T)
 
+tests.bats := /usr/bin/bats
+tests.bats.flags := --pretty --timing --recursive --print-output-on-failure
+
 .PHONY: tests
-tests:
-	bats --timing --recursive --print-output-on-failure $(TESTS)
+tests: | $(tests.bats)
+	$(tests.bats) $(tests.bats.flags) $(TESTS) | $(COLORIZE)
 
 .PHONY: watch
 tests.watch:
 	onmod $(WIP.SOURCES) . -- 'printf "\e[H\e[22J" ; $(MAKE) tests'
 
 .PHONY: debug
-tests.debug:
-	$(MAKE) -C $(WIP.SOURCES)
-	bats --verbose-run --print-output-on-failure --show-output-of-passing-tests $(TESTS)
+tests.debug: tests.bats.flags = --pretty --verbose-run --print-output-on-failure --show-output-of-passing-tests
+tests.debug: tests
 
 .PHONY: watch-debug
 tests.debug.watch:
