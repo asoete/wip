@@ -32,13 +32,17 @@ makefile: `make.d/auth-proxy-mock.mk`
 ```bash
 ./bin/auth-proxy-mock --help
 	# Usage of ./bin/auth-proxy-mock:
-	#   -forward-to address
+	#   -forward-to string
 	#     	forward requests to this address (default "http://127.0.0.1:8080/")
-	#   -listen-on address
+	#   -listen-on string
 	#     	listen on this address for requests to forward (default "127.0.0.1:8888")
-	#   -remote-user username
-	#     	set value for the REMOTE_USER http header to this username
-	#   -sso-sub uuid
-	#     	set value for the SSO_SUB http header to this uuid
+	#   -remote-user string
+	#     	set REMOTE_USER http header
+	#   -s string
+	#     	shorthand: set SSO_SUB http header
+	#   -sso-sub string
+	#     	set SSO_SUB http header
+	#   -u string
+	#     	shorthand: set REMOTE_USER http header
 ```
 <!-- END bin/auth-proxy-mock --help -->

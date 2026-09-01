@@ -1,5 +1,7 @@
 # -- General
-.DEFAULT_GOAL := compile
+# .DEFAULT_GOAL := wip.bin docs
+.PHONY: default
+default: wip.bin docs
 
 # -- MAIN Config
 
