@@ -5,7 +5,7 @@ tests.bats := /usr/bin/bats
 tests.bats.flags := --pretty --timing --recursive --print-output-on-failure
 
 .PHONY: tests
-tests: | $(tests.bats)
+tests: $(WIP.BIN) | $(tests.bats)
 	$(tests.bats) $(tests.bats.flags) $(TESTS) | $(COLORIZE)
 
 .PHONY: watch
