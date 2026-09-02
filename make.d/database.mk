@@ -16,8 +16,12 @@ db.delete:
 	@printf ">_ rm -v $(DB.SQLITE_FILE)\n"
 	@read -p "are you sure (y|yes|NO): " ; \
 		printf "$$REPLY" | grep -qEi '^(y|yes)$$' \
-		&& { rm -v $(DB.SQLITE_FILE) || true ; } \
+		&& { $(MAKE db.delete.no-confirm) || true ; } \
 		|| printf ' `-> abort...\n'
+
+.PHONY: db.delete.no-confirm
+db.delete.no-confirm:
+		rm -v $(DB.SQLITE_FILE)
 
 # .PHONY: rpm.migrations
 # rpm.migrations: rpm/migrate.sh
