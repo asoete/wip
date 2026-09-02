@@ -3,7 +3,23 @@
 .PHONY: default
 default: wip.bin docs
 
-# -- MAIN Config
+###
+### This file should define all variables used in multiple files
+### and/or variables which can be overwritten by the user
+###
+
+# == BUILD variables ==
+# ============================================================================
+
+# -- WiP
+
+WIP.BIN := bin/wip
+WIP.SOURCES := $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
+
+# == RUN/SERVER variables ==
+# ============================================================================
+
+# -- WIP serve Config
 
 WEB.ADDRESS := 127.0.0.1:8080
 WIP.PIDFILE := /dev/shm/wip/wip.pid
@@ -15,8 +31,5 @@ DB.DSN := sqlite:$(DB.SQLITE_FILE)
 CTL.ADDRESS := 127.0.0.1:8100
 CTL.TOKEN := let-the-dev-times-roll
 CTL.TOKEN_HEADER := X-WiP-Ctl-Token: $(CTL.TOKEN)
-
-# -- Building
-WIP.SOURCES ?= $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
 
 include make.d/*.mk

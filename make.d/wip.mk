@@ -1,13 +1,9 @@
-WIP_SOURCES ?= $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
-# SOURCES += Makefile
-# SOURCES += $(shell find make.d/ -type f -name "*.mk")
+# WIP.BIN -> See main Makefile
+# WIP.SOURCES -> See main Makefile
 
 GO := /usr/bin/go
 GO_FLAGS := CGO_ENABLED=0
 
-.PHONY: wip.bin
-wip.bin: bin/wip
-
 # Compile a production build (excludes /dev/* and /test-fixtures/* endpoints)
-bin/wip: $(WIP_SOURCES) Makefile
+$(WIP.BIN): $(WIP.SOURCES) Makefile
 	$(GO_FLAGS) $(GO) build -o $@ cmd/wip/*.go

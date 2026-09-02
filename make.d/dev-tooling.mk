@@ -1,7 +1,7 @@
 # Format the source code
 .PHONY: fmt
 fmt:
-	@echo $(dir $(WIP_SOURCES)) | tr ' ' '\n' | sort | uniq | xargs -I {} go fmt {}
+	@echo $(dir $(WIP.SOURCES)) | tr ' ' '\n' | sort | uniq | xargs -I {} go fmt {}
 
 # Compile and run a DEV build
 .PHONY: run
