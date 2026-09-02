@@ -4,7 +4,7 @@ APM.BIN := bin/auth-proxy-mock
 
 APM.LISTEN_ADDR := 127.0.0.1:8888
 APM.REMOTE_USER := $(USER)
-APM.SSO_SUB := $(shell printf $(USER) | md5sum | awk '{ print $$1}' | sed -E 's/(.{8})(.{4})(.{4})(.{4})/\1-\2-\3-\4-/') # poor mans uuid
+APM.SSO_SUB := $(shell printf $(USER) | ./tools/stdin-to-uuid.sh) # poor mans uuid
 
 .PHONY: auth-proxy-mock
 auth-proxy-mock: $(APM.BIN)
