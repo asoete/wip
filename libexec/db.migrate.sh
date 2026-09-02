@@ -38,7 +38,7 @@ function main() {
 
 			printf "\e[33m[W] detected a directory as input ($file). Scanning for SQL files... \e[0m\n" 1>&2
 
-			for subfile in $(find "${default_migration_source_dir}" -iname "${sql_file_pattern}" | sort -V) ; do
+			for subfile in $(find "${file}" -iname "${sql_file_pattern}" | sort -V) ; do
 				migrate_single_file "$subfile"
 			done
 
