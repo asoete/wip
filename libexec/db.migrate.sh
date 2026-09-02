@@ -66,7 +66,7 @@ function migrate_single_file() {
 
 	if [ "${sql_res}" = "${file}" ] ; then
 
-		printf "\e[32;4m [  NOOP  ]  %-60s \e[4m%s \e[0m\n" \
+		printf "\e[32m [  NOOP  ]  %-60s \e[4m%s \e[0m\n" \
 			"$file" \
 			"$(sqlite_run "SELECT datetime(date, 'localtime') FROM migrations WHERE file = '%s';" "$file")"
 
@@ -75,7 +75,7 @@ function migrate_single_file() {
 
 	mapfile migration_result < <(sqlite < "$file" | tr -d '\n')
 
-	printf "\e[32;1;4m \e[7m[MIGRATED]\e[27m  %-60s \e[4m%s \e[0m\n" \
+	printf "\e[32;1m \e[7m[MIGRATED]\e[27m  %-60s \e[4m%s \e[0m\n" \
 		"$file" \
 		"${migration_result[@]}"
 
