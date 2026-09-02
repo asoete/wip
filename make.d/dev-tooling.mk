@@ -9,7 +9,7 @@ run: fmt
 	WIP_CTL_TOKEN="$(CTL.TOKEN)" \
 		$(GO_FLAGS) $(GO) run -tags debug cmd/wip/*.go \
 			--ctl.address $(CTL.ADDRESS) \
-			--web.address $(WEB.ADDRESS) \
+			--web.address $(WIP.ADDRESS) \
 			--pidfile $(WIP.PIDFILE) \
 			--db.dsn $(DB.DSN) \
 
