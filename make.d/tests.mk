@@ -48,6 +48,13 @@ define print-end-make-target
 @printf "\n"
 endef
 
+
+tests.config:
+	$(call print-start-make-target)
+	$(MAKE) $(make.tests.flags)  -- \
+		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-config) \
+		--tests.run suite=config
+	$(call print-end-make-target)
 tests.help:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
