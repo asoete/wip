@@ -7,10 +7,11 @@ db: db.create db.migrate
 db.create: | $(DB.SQLITE_FILE)
 
 db.migrate: | $(DB.SQLITE_FILE)
-	DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh
+	VERBOSITY="$(if $(DEBUG),$(DEBUG),0)" \
+		DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh
 
 $(DB.SQLITE_FILE): sql/schema/20260825145000_create-table-migrations.sql
-	sqlite3 $(DB.SQLITE_FILE) < sql/schema/20260825145000_create-table-migrations.sql
+	sqlite3 $(DB.SQLITE_FILE) < sql/schema/20260825145000_create-table-migrations.sql >/dev/null
 
 db.delete:
 	@printf ">_ rm -v $(DB.SQLITE_FILE)\n"
@@ -21,7 +22,7 @@ db.delete:
 
 .PHONY: db.delete.no-confirm
 db.delete.no-confirm:
-		rm -v $(DB.SQLITE_FILE)
+		rm -f $(if $(DEBUG),-v) $(DB.SQLITE_FILE)
 
 # .PHONY: rpm.migrations
 # rpm.migrations: rpm/migrate.sh
