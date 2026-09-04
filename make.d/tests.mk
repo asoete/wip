@@ -70,6 +70,13 @@ tests.help:
 		--tests.run suite=help
 	$(call print-end-make-target)
 
+tests.seeds:
+	$(call print-start-make-target)
+	$(MAKE) $(make.tests.flags)  -- \
+		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) \
+		--tests.run suite=seeds
+	$(call print-end-make-target)
+
 # == TEST RUNNERS ==
 # ============================================================================
 
