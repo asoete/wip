@@ -10,8 +10,11 @@ db.migrate: | $(DB.SQLITE_FILE)
 	VERBOSITY="$(if $(DEBUG),$(DEBUG),0)" \
 		DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh
 
-$(DB.SQLITE_FILE): sql/schema/20260825145000_create-table-migrations.sql
+$(DB.SQLITE_FILE): sql/schema/20260825145000_create-table-migrations.sql | $(dir $(DB.SQLITE_FILE))
 	sqlite3 $(DB.SQLITE_FILE) < sql/schema/20260825145000_create-table-migrations.sql >/dev/null
+
+$(dir $(DB.SQLITE_FILE)):
+	mkdir -p $@
 
 db.delete:
 	@printf ">_ rm -v $(DB.SQLITE_FILE)\n"
