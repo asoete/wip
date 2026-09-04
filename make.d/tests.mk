@@ -33,6 +33,7 @@ tests.newdb.seed:
 ### use `make [OPTION] -- <priv-targets>` to actually execute the private
 ### targets...
 
+tests.all: tests.alarms tests.config tests.seeds
 
 define print-start-make-target
 @printf "\n"
