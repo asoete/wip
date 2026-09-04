@@ -66,20 +66,24 @@ function migrate_single_file() {
 
 	if [ "${sql_res}" = "${file}" ] ; then
 
+		test $VERBOSITY -ge $LVL_INFO && \
 		printf "\e[32m [  NOOP  ]  %-60s \e[4m%s \e[0m\n" \
 			"$file" \
 			"$(sqlite_run "SELECT datetime(date, 'localtime') FROM migrations WHERE file = '%s';" "$file")"
 
-		return
+		return 0
 	fi
 
 	mapfile migration_result < <(sqlite < "$file" | tr -d '\n')
 
+	test $VERBOSITY -ge $LVL_INFO && \
 	printf "\e[32;1m \e[7m[MIGRATED]\e[27m  %-60s \e[4m%s \e[0m\n" \
 		"$file" \
 		"${migration_result[@]}"
 
-
+	# return 0, otherwise the exit code if the last command is returned, which
+	# my be the (non-zero) VERBOSITY test
+	return 0
 }
 
 function sqlite_run() {
