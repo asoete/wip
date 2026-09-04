@@ -48,6 +48,15 @@ define print-end-make-target
 @printf "\n"
 endef
 
+tests.alarms: $(TESTS_DIR)/alarms
+	$(call print-start-make-target)
+	$(MAKE) $(make.tests.flags) -- \
+		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-alarms) \
+		tests.env \
+		tests.newdb \
+		tests.seeds \
+		--tests.run suite=alarms
+	$(call print-end-make-target)
 
 tests.config:
 	$(call print-start-make-target)
