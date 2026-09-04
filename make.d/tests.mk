@@ -1,12 +1,75 @@
 TESTS_DIR := t
-TESTS := $(TESTS_DIR)/$(T)
+TSUITE := $(TESTS_DIR)/$(suite)
 
-tests.bats := /usr/bin/bats
-tests.bats.flags := --pretty --timing --recursive --print-output-on-failure
+bats := /usr/bin/bats
+bats.flags := --pretty --timing --recursive --print-output-on-failure
+make.tests.flags := --silent
+ifdef DEBUG
+bats.flags := --pretty --verbose-run --print-output-on-failure --show-output-of-passing-tests
+make.tests.flags := 
+endif
 
-.PHONY: tests
-tests: $(WIP.BIN) | $(tests.bats)
-	$(tests.bats) $(tests.bats.flags) $(TESTS) | $(COLORIZE)
+# == DATABASE ==
+# ============================================================================
+
+.PHONY: tests.newdb tests.newdb.seed
+
+test.db.file ?= /dev/shm/wip/wip.sqlite
+
+define tests.newdb.file.namespace-with
+/dev/shm/wip/wip.$(1).sqlite
+endef
+
+tests.newdb: db.delete.no-confirm db tests.newdb.seed
+
+tests.newdb.seed.sources := $(shell find t/db/seeds -iname '*.sql')
+tests.newdb.seed:
+	DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh $(tests.newdb.seed.sources)
+
+# == TEST SUITES ==
+# ============================================================================
+
+### Note: as we use the `--` prefix to indicate "private" targets, we should
+### use `make [OPTION] -- <priv-targets>` to actually execute the private
+### targets...
+
+
+define print-start-make-target
+@printf "\n"
+@printf $(if $(DEBUG),">_ ============================================================================\n","") | $(COLORIZE)
+@printf ">_ *** START MAKE[%d] $@ START *** \n" "$(MAKELEVEL)" | $(COLORIZE)
+@printf $(if $(DEBUG),">_ ============================================================================\n","") | $(COLORIZE)
+endef
+
+define print-end-make-target
+@printf $(if $(DEBUG),">_ ============================================================================\n","") | $(COLORIZE)
+@printf ">_ *** END MAKE[%d] $@ END *** \n" "$(MAKELEVEL)" | $(COLORIZE)
+@printf $(if $(DEBUG),">_ ============================================================================\n","") | $(COLORIZE)
+@printf "\n"
+endef
+
+tests.help:
+	$(call print-start-make-target)
+	$(MAKE) $(make.tests.flags)  -- \
+		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-help) \
+		--tests.run suite=help
+	$(call print-end-make-target)
+
+# == TEST RUNNERS ==
+# ============================================================================
+
+export DB_FILE
+
+### Note: use the `--` prefix to indicate "private" targets
+### This makes calling these targets from the cli more inconvenient
+### use `make [OPTION] -- <priv-targets>` to run the private targets
+
+.PHONY: --tests.run
+--tests.run: $(WIP.BIN) | $(tests.bats)
+	BASE_URL="http://$(WIP.ADDRESS)" \
+	DB_FILE="$(DB.SQLITE_FILE)" \
+		$(bats) $(bats.flags) $(TSUITE) \
+		| $(COLORIZE)
 
 .PHONY: watch
 tests.watch:
@@ -14,12 +77,11 @@ tests.watch:
 
 .PHONY: debug
 tests.debug: tests.bats.flags = --pretty --verbose-run --print-output-on-failure --show-output-of-passing-tests
-tests.debug: tests
+tests.debug: tests.run
 
 .PHONY: watch-debug
 tests.debug.watch:
 	onmod $(WIP.SOURCES) . -- 'printf "\e[H\e[22J" ; make debug '
-
 
 .PHONY: %.bats
 %.bats:
