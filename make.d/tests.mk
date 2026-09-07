@@ -24,7 +24,9 @@ tests.newdb: db.delete.no-confirm db tests.newdb.seed
 
 tests.newdb.seed.sources := $(shell find t/db/seeds -iname '*.sql')
 tests.newdb.seed:
-	DB_FILE="$(DB.SQLITE_FILE)" libexec/db.migrate.sh $(tests.newdb.seed.sources)
+	VERBOSITY="$(if $(DEBUG),$(DEBUG),0)" \
+		DB_FILE="$(DB.SQLITE_FILE)" \
+			libexec/db.migrate.sh $(tests.newdb.seed.sources)
 
 # == TEST SUITES ==
 # ============================================================================
