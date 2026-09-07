@@ -33,7 +33,10 @@ tests.newdb.seed:
 ### use `make [OPTION] -- <priv-targets>` to actually execute the private
 ### targets...
 
-tests.all: tests.alarms tests.config tests.seeds
+tests.all: \
+	tests.help \
+	tests.config \
+	tests.alarms
 
 define print-start-make-target
 @printf "\n"
@@ -80,10 +83,16 @@ tests.help:
 		--tests.run suite=help
 	$(call print-end-make-target)
 
+# $(intcmp $(MAKELEVEL),1, tests.newdb):
+#     -> If we are summoned directly from the cli (indicated by MAKELEVEL=0),
+#     run init db stuff
+# See: https://www.gnu.org/software/make/manual/html_node/Conditional-Functions.html#index-intcmp
+# for detail ons intcmp
 tests.seeds:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
 		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) \
+		$(intcmp $(MAKELEVEL),1, tests.newdb) \
 		--tests.run suite=seeds
 	$(call print-end-make-target)
 
