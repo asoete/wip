@@ -73,7 +73,7 @@ tests.env:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
 		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) \
-		--tests.run suite=env \
+		--tests.run suite=env
 	$(call print-end-make-target)
 
 tests.help:
