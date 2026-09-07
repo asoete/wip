@@ -2,10 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 var listenAddr string
@@ -51,6 +54,37 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Printf("== DEBUG: dump config =====================================\n")
+
+	configmap := map[string]string{
+		"--listen-on": listenAddr,
+		"--forward-to": forwardToAddr,
+	}
+
+	for name, value := range configmap {
+		fmt.Printf("%20s = %s\n", name, value)
+	}
+
+	configmap = map[string]string{
+		"REMOTE_USER": remoteUser,
+		"SSO_SUB": ssoSub,
+	}
+
+	for name, value := range configmap {
+		fmt.Printf("%20s = %s\n", name, value)
+	}
+
+	for _, input := range xheaders {
+		parts := strings.SplitN(input, ":", 2)
+		if len(parts) < 2 {
+			slog.Warn("HTTP --header has no value!", "name", parts[0], "value", "")
+			parts = append(parts, "")
+		}
+		fmt.Printf("%20s = %s\n", parts[0], parts[1])
+	}
+
+	fmt.Printf("===========================================================\n")
 
 	proxy := &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
