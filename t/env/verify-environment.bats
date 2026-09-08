@@ -1,17 +1,17 @@
 bats_require_minimum_version 1.5.0
 
-@test "verify_environment: ensure BASE_URL is defined" {
+@test "verify_environment: ensure WIP_URL is defined" {
 
-	test -n "${BASE_URL}"
+	test -n "${WIP_URL}"
 
-	[[ "${BASE_URL}" =~ https?://[a-zA-Z0-9.]+:[0-9]+ ]]
+	[[ "${WIP_URL}" =~ https?://[a-zA-Z0-9.]+:[0-9]+ ]]
 }
 
 # ---------------------------------------------------------------------------- #
 
 @test "verify_environment: ensure WiP service is accepting requests" {
 
-	run -0 curl -vis "${BASE_URL}"
+	run -0 curl -vis "${WIP_URL}"
 }
 
 

@@ -23,7 +23,7 @@ function diff() {
 function wip_curl() {
 
 	path="${1:-/}" ; shift
-	url="${BASE_URL}${path}"
+	url="${WIP_URL}${path}"
 
 	#log "CURL %s %s" "${url}" "$*"
 	log "CURL %s %s" "${path}" "$*"

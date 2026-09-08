@@ -109,7 +109,7 @@ export DB_FILE
 
 .PHONY: --tests.run
 --tests.run: $(WIP.BIN) | $(tests.bats)
-	BASE_URL="http://$(WIP.ADDRESS)" \
+	WIP_URL="http://$(WIP.ADDRESS)" \
 	DB_FILE="$(DB.SQLITE_FILE)" \
 		$(bats) $(bats.flags) $(TSUITE) \
 		| $(COLORIZE)

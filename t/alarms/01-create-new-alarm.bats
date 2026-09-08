@@ -5,27 +5,6 @@ set -ueo pipefail
 
 # ---------------------------------------------------------------------------- #
 
-@test "ensure BASE_URL is defined" {
-
-	test -n "${BASE_URL}"
-
-	[[ "${BASE_URL}" =~ https?://[a-zA-Z0-9.]+:[0-9]+ ]]
-
-}
-
-# ---------------------------------------------------------------------------- #
-
-@test "ensure DB_FILE is defined" {
-
-	test -n "${DB_FILE}"
-
-	test -f "${DB_FILE}"
-
-}
-
-
-# ---------------------------------------------------------------------------- #
-
 @test "POST /timers deadline=15:00" {
 
 	wip_curl /timers -d deadline="15:00"
