@@ -109,6 +109,8 @@ export DB_FILE
 
 .PHONY: --tests.run
 --tests.run: $(WIP.BIN) | $(tests.bats)
+	CTL_URL="http://$(CTL.ADDRESS)" \
+	CTL_AUTH_HEADER="$(CTL.TOKEN_HEADER)" \
 	WIP_URL="http://$(WIP.ADDRESS)" \
 	DB_FILE="$(DB.SQLITE_FILE)" \
 		$(bats) $(bats.flags) $(TSUITE) \

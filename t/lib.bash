@@ -25,11 +25,31 @@ function wip_curl() {
 	path="${1:-/}" ; shift
 	url="${WIP_URL}${path}"
 
-	#log "CURL %s %s" "${url}" "$*"
-	log "CURL %s %s" "${path}" "$*"
+	log "WiP CURL %s %s" "${path}" "$*"
 
 	run -0 --separate-stderr \
 		curl -i -s "${url}" \
+		-w "%{stderr}Status: %{http_code}\n" \
+		"$@"
+}
+
+# ----------------------------------------------------------------------------
+
+function ctl_curl() {
+
+	path="${1:-/}" ; shift
+
+	# If path is not prefixed with /ctl -> add the prefix
+	if [[ "$path" != "/ctl/" ]] ; then
+		path="/ctl${path}"
+	fi
+
+	url="${CTL_URL}${path}"
+
+	log "ctl CURL %s %s" "${path}" "$*"
+
+	run -0 --separate-stderr \
+		curl -i -s -H "${CTL_AUTH_HEADER}" "${url}" \
 		-w "%{stderr}Status: %{http_code}\n" \
 		"$@"
 }
