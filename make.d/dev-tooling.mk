@@ -22,6 +22,14 @@ post-ctl:
 		http://$(CTL.ADDRESS)/$(url:/%=%) \
 		|& sed 's/^/|> /g'
 
+# USAGE: make get-ctl url=/ctl/migrate/fresh
+.PHONY: get-ctl
+get-ctl:
+	@printf ">_ GET http://$(CTL.ADDRESS)/$(url:/%=%)\n"
+	@curl -i -s -X GET -H "$(CTL.TOKEN_HEADER)" \
+		http://$(CTL.ADDRESS)/$(url:/%=%) \
+		|& sed 's/^/|> /g'
+
 # Kill a running server via the builtin controls
 .PHONY: web.server.kill
 wip.server.kill:
