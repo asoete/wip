@@ -93,8 +93,8 @@ tests.help:
 tests.seeds:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) \
-		$(intcmp $(MAKELEVEL),1, tests.newdb) \
+		$(intcmp $(MAKELEVEL),1,DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) ) \
+		$(intcmp $(MAKELEVEL),1,tests.newdb) \
 		--tests.run suite=seeds
 	$(call print-end-make-target)
 
