@@ -10,6 +10,7 @@ function diff() {
 	difft \
 		--skip-unchanged \
 		--exit-code \
+		--display side-by-side-show-both \
 		--color always \
 		--override '*:JSON' \
 		--context 99 \
