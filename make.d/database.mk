@@ -4,6 +4,9 @@ DB.SCHEMA_SOURCES := $(shell find sql/schema/ -iname '*.sql' | sort -V)
 
 db: db.create db.migrate
 
+db.open: | $(DB.SQLITE_FILE)
+	sqlite3 $(DB.SQLITE_FILE)
+
 db.create: | $(DB.SQLITE_FILE)
 
 db.migrate: | $(DB.SQLITE_FILE)
