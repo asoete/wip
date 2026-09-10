@@ -38,6 +38,7 @@ tests.newdb.seed:
 tests.all: \
 	tests.help \
 	tests.config \
+	tests.users \
 	tests.alarms
 
 define print-start-make-target
@@ -96,6 +97,14 @@ tests.seeds:
 		$(intcmp $(MAKELEVEL),1,DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) ) \
 		$(intcmp $(MAKELEVEL),1,tests.newdb) \
 		--tests.run suite=seeds
+	$(call print-end-make-target)
+
+tests.users:
+	$(call print-start-make-target)
+	$(MAKE) $(make.tests.flags)  -- \
+		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-users) \
+		tests.newdb \
+		--tests.run suite=users
 	$(call print-end-make-target)
 
 # == TEST RUNNERS ==
