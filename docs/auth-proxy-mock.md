@@ -21,7 +21,7 @@ makefile: `make.d/auth-proxy-mock.mk`
  | MAKE OPTION       | DEFAULT VALUE               | PASSED TO                           | DESCRIPTION                                          |
  | ---               | ---                         | ---                                 | ---                                                  |
  | `APM.LISTEN_ADDR` | `127.0.0.1:8888`            | `auth-proxy-mock --listen-on=...`   | Accept requests on this address                      |
- | `WEB.ADDRESS`     | `127.0.0.1:8080`            | `auth-proxy-mock --forward-to=...`  | Forward requests to this WiP service instance        |
+ | `WIP.ADDRESS`     | `127.0.0.1:8080`            | `auth-proxy-mock --forward-to=...`  | Forward requests to this WiP service instance        |
  | `APM.REMOTE_USER` | `$USER`                     | `auth-proxy-mock --remote-user=...` | Inject this remote user in the HTTP request (header) |
  | `APM.SSO_SUB`     | `<md5sum($USER) | as-uuid>` | `auth-proxy-mock --sso-sub=...`     | Inject this sso sub in the HTTP request (header)     |
 <!-- END make apm.start-server.usage.options -->
@@ -34,6 +34,8 @@ makefile: `make.d/auth-proxy-mock.mk`
 	# Usage of ./bin/auth-proxy-mock:
 	#   -forward-to string
 	#     	forward requests to this address (default "http://127.0.0.1:8080/")
+	#   -header name:value
+	#     	specify additional HTTP headers (name:value)
 	#   -listen-on string
 	#     	listen on this address for requests to forward (default "127.0.0.1:8888")
 	#   -remote-user string
