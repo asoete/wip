@@ -20,17 +20,45 @@ function diff() {
 # HTTP
 # =============================================================================
 
+function curl_wrapped() {
+
+	declare -a curl_args
+
+	curl_args+=("--silent")
+
+	for arg in "$@" ; do
+
+		case "$arg" in
+			+ecode)
+				curl_args+=("--write-out" "%{stderr}Status: %{http_code}\n")
+				;;
+			+elocation)
+				curl_args+=("--write-out" "%{stderr}Location: %{redirect_url}\n")
+				;;
+			+headers)
+				curl_args+=("--show-headers")
+				;;
+			+*)
+				printf "curl_wrapped(): invalid expansion code: %s\n" "$arg" 1>&2
+				get_trace "\t |> " 1>&2
+				exit 1
+				;;
+			*)
+				curl_args+=("$arg")
+				;;
+		esac
+
+	done
+
+	curl "${curl_args[@]}"
+}
+
 function wip_curl() {
 
 	path="${1:-/}" ; shift
 	url="${WIP_URL}${path}"
 
-	log "WiP CURL %s %s" "${path}" "$*"
-
-	run -0 --separate-stderr \
-		curl -i -s "${url}" \
-		-w "%{stderr}Status: %{http_code}\n" \
-		"$@"
+	curl_wrapped "${url}" "$@"
 }
 
 # ----------------------------------------------------------------------------
@@ -46,12 +74,7 @@ function ctl_curl() {
 
 	url="${CTL_URL}${path}"
 
-	log "ctl CURL %s %s" "${path}" "$*"
-
-	run -0 --separate-stderr \
-		curl -i -s -H "${CTL_AUTH_HEADER}" "${url}" \
-		-w "%{stderr}Status: %{http_code}\n" \
-		"$@"
+	curl_wrapped -H "${CTL_AUTH_HEADER}" "${url}" "$@"
 }
 
 # =============================================================================
@@ -127,7 +150,7 @@ function get_trace_index() {
 
 function log() {
 
-	printf "[I] "
-	printf "$@"
-	printf "\n"
+	printf "[I] " 1>&2
+	printf "$@" 1>&2
+	printf "\n" 1>&2
 }

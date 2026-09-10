@@ -17,6 +17,15 @@ load "../lib.bash"
 
 # ---------------------------------------------------------------------------- #
 
+@test "verify_environment: ensure wip_curl() is functioning" {
+
+	run --separate-stderr -0 wip_curl /some-fake-page +ecode
+
+	[[ ${stderr_lines[-1]} = "Status: 404" ]]
+}
+
+# ---------------------------------------------------------------------------- #
+
 @test "verify_environment: ensure CTL_URL is defined" {
 
 	test -n "${CTL_URL}"
@@ -33,12 +42,14 @@ load "../lib.bash"
 	run -0 curl -vis "${CTL_URL}"
 }
 
+# ---------------------------------------------------------------------------- #
+
 @test "verify_environment: ensure ctl_curl is functioning" {
 
-	run --separate-stderr -0 ctl_curl /ping -w ""
+	run --separate-stderr -0 ctl_curl /ping +ecode
 
-	printf "LINES[] = %s\n" "${lines[@]}"
 	[[ ${lines[-1]} = "pong" ]]
+	[[ ${stderr_lines[-1]} = "Status: 200" ]]
 }
 
 
