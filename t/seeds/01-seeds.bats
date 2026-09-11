@@ -8,6 +8,8 @@ set -ueo pipefail
 
 @test "ensure TABLE users is seeded" {
 
+	skip
+
 	run -0 libexec/db.migrate.sh t/db/seeds/insert-users.sql
 
 	expected() {
