@@ -103,7 +103,7 @@ function ctl_curl() {
 #	-> if empyt result, replace with []
 function sqlite_json() {
 
-	printf "SQLITE3 : %s" "$*" 1>&2
+	printf "[SQLITE3] : %s" "$*" 1>&2
 
 	mapfile -t result < <(sqlite3 -json "${DB_FILE}" "$@")
 
@@ -112,7 +112,11 @@ function sqlite_json() {
 		printf "[]\n"
 	else 
 		printf "   (%d rows)\n" "${#result[@]}" 1>&2
-		printf "%s\n" "${result[@]}" | jq . --sort-keys
+		printf "%s\n" "${result[@]}" | jq . --sort-keys || {
+			printf "[SQLITE3] unable to parse JSON response:\n" 1>&2
+			printf "[SQLITE3 response]:  %s\n" "${result[@]}" 1>&2
+			false
+		}
 	fi
 }
 
