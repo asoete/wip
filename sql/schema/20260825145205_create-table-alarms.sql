@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS alarms (
 	created_at TEXT NOT NULL DEFAULT 'now',
 	deadline TEXT NOT NULL,
 	cancelled_at TEXT,
+	description TEXT,
 	FOREIGN KEY(owner_id) REFERENCES users(user_id)
 );
 
