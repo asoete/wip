@@ -25,6 +25,7 @@ WIP.ADDRESS := 127.0.0.1:8080
 WIP.PIDFILE := /dev/shm/wip/wip.pid
 DB.SQLITE_FILE := data/work-in-peace.sqlite
 DB.DSN := sqlite:$(DB.SQLITE_FILE)
+PRX.ADDRESS := 127.0.0.1:8888
 
 # -- CONTROL Config
 
