@@ -28,7 +28,6 @@ function curl_wrapped() {
 	curl_args+=("--silent")
 
 	for arg in "$@" ; do
-
 		case "$arg" in
 			+ecode)
 				curl_args+=("--write-out" "%{stderr}Status: %{http_code}\n")
@@ -48,8 +47,24 @@ function curl_wrapped() {
 				curl_args+=("$arg")
 				;;
 		esac
+	done
+
+	printf "[curl debug]: /usr/bin/curl" 1>&2
+	for arg in "${curl_args[@]}" ; do
+		case "$arg" in
+			-*)
+				printf "\n[curl debug]:    %s" "$arg" 1>&2
+				;;
+			http*)
+				printf "\n[curl debug]:    %s" "$arg" 1>&2
+				;;
+			*)
+				printf " '%s'" "$arg" 1>&2
+				;;
+		esac
 
 	done
+	printf "\n" 1>&2
 
 	curl "${curl_args[@]}"
 }
