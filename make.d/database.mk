@@ -10,8 +10,9 @@ db: db.create db.migrate db.sql
 
 db.reset: db.delete db
 
+DB.OPEN.MODE := -markdown
 db.open: | $(DB.SQLITE_FILE)
-	sqlite3 $(DB.SQLITE_FILE)
+	sqlite3 $(DB.OPEN.MODE) $(DB.SQLITE_FILE)
 
 db.create: | $(DB.SQLITE_FILE)
 
