@@ -23,6 +23,7 @@ endef
 tests.newdb: db.delete.no-confirm db tests.newdb.seed
 
 tests.newdb.seed.sources := $(shell find t/db/seeds -iname '*.sql')
+$(warning $(tests.newdb.seed.sources))
 tests.newdb.seed:
 	VERBOSITY="$(if $(DEBUG),$(DEBUG),0)" \
 		DB_FILE="$(DB.SQLITE_FILE)" \
@@ -120,7 +121,8 @@ export DB_FILE
 --tests.run: $(WIP.BIN) | $(tests.bats)
 	CTL_URL="http://$(CTL.ADDRESS)" \
 	CTL_AUTH_HEADER="$(CTL.TOKEN_HEADER)" \
-	WIP_URL="http://$(PRX.ADDRESS)" \
+	PRX_URL="http://$(PRX.ADDRESS)" \
+	WIP_URL="http://$(WIP.ADDRESS)" \
 	DB_FILE="$(DB.SQLITE_FILE)" \
 		$(bats) $(bats.flags) $(TSUITE) \
 		| $(COLORIZE)

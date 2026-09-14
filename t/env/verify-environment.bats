@@ -1,6 +1,31 @@
 bats_require_minimum_version 1.5.0
 load "../lib.bash"
 
+@test "verify_environment: ensure PRX_URL is defined" {
+
+	test -n "${PRX_URL}"
+
+	[[ "${PRX_URL}" =~ https?://[a-zA-Z0-9.]+:[0-9]+ ]]
+}
+
+# ---------------------------------------------------------------------------- #
+
+@test "verify_environment: ensure Proxy service is accepting requests" {
+
+	run -0 curl -vis "${PRX_URL}"
+}
+
+# ---------------------------------------------------------------------------- #
+
+@test "verify_environment: ensure prx_curl() is functioning" {
+
+	run --separate-stderr -0 prx_curl /some-fake-page +ecode
+
+	[[ ${stderr_lines[-1]} = "Status: 404" ]]
+}
+
+# ---------------------------------------------------------------------------- #
+
 @test "verify_environment: ensure WIP_URL is defined" {
 
 	test -n "${WIP_URL}"

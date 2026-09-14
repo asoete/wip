@@ -70,6 +70,16 @@ function curl_wrapped() {
 	curl "${curl_args[@]}"
 }
 
+function prx_curl() {
+
+	path="${1:-/}" ; shift
+	url="${PRX_URL}${path}"
+
+	curl_wrapped "${url}" "$@"
+}
+
+# ----------------------------------------------------------------------------
+
 function wip_curl() {
 
 	path="${1:-/}" ; shift
