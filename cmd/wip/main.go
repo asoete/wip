@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -10,6 +11,9 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	_ "modernc.org/sqlite"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 )
 
 // flags
@@ -26,6 +30,10 @@ var tokenMuxToken = "wip-ctl-token-please-change!"
 
 var dumpConfig = false
 var pidfile string
+
+// database handles
+var dbRO *db.Queries
+var dbRW *db.Queries
 
 // types
 type tokenMux struct {
@@ -111,6 +119,14 @@ func main() {
 			log.Fatal("create pidfile failed:", err)
 		}
 	}
+
+	// init database handles
+	dbhandle, err := sql.Open("sqlite", dbDSN)
+	if err != nil {
+		log.Fatalf("unable to parse database(%s): %w", dbDSN, err)
+	}
+
+	dbRW = db.New(dbhandle)
 
 	// Start (separate) server to listen for control commands
 	go func() {
