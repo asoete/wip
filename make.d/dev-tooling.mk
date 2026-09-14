@@ -49,7 +49,7 @@ wip.server-loop.start: /usr/bin/inotifywait
 wip.server-killer.start: | tools/notifywait.sh
 	./tools/notifywait.sh \
 		'$(MAKE) --no-print-directory wip.server.kill' \
-		$(shell find * -maxdepth 0 -not -iname 'bin')
+		$(shell find * -maxdepth 0 -not -iname 'bin' -not -name 'data')
 
 # Start all required services for "a good development experience" (TM)
 .PHONY: serve
