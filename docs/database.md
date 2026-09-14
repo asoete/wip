@@ -7,7 +7,7 @@ The default (development) location is `data/work-in-peace.sqlite`.
 This or alternate locations can be specified at startup via: `--db.dsn
 <string:path/to/db.sqlite>`
 
-## Management
+## MANAGE SQLITE DATABASE
 
 As with most things related to WiP, a `make` "interface" is provided to manage
 database interactions.
@@ -136,7 +136,7 @@ sh rpm/migrate.sh /tmp/db.sqlite
 	# sql/schema/20260825145522_create-table-user_channels.sql        [  DONE  ] 2026-08-28 15:22:21
 ```
 
-## Delete / Destroy database
+### Delete / Destroy database
 
 ** !! WARNING: this will permanently delete data !! **
 
@@ -145,4 +145,73 @@ make db.delete
 	# >_ rm -v data/work-in-peace.sqlite
 	# are you sure (y|yes|NO): y
 	# removed 'data/work-in-peace.sqlite'
+```
+
+## USE DATABASE
+
+In order to interface with the database, we need some dependencies
+
+1. [`modernc.org/sqlite`](https://pkg.go.dev/modernc.org/sqlite) ( (pure go) sqlite driver for stdlib [database/sql](https://pkg.go.dev/database/sql))
+2. [`sqlc`](https://sqlc.dev/) (for generating typesafe database abstraction / interaction code)
+
+
+### Installation
+
+**`sqlc`** is only required during development as it is performing codegen based on SQL files...
+
+I used `nix` to add this to my development environment
+
+```bash
+nix-shell -p sqlc
+
+sqlc version
+  # v1.31.1
+```
+
+**`modernc.org/sqlite`** should be added as a _normal_ go dependency:
+
+```bash
+cat go.mod
+  # module vsc.irc.ugent.be/itsupport/work-in-peace
+  # 
+  # go 1.26.5
+
+go get modernc.org/sqlite
+  # go: downloading modernc.org/sqlite v1.58.0
+  # go: downloading golang.org/x/sys v0.47.0
+  # go: downloading modernc.org/libc v1.75.6
+  # go: downloading github.com/ncruces/go-strftime v1.0.0
+  # go: downloading modernc.org/mathutil v1.7.1
+  # go: downloading github.com/google/uuid v1.6.0
+  # go: downloading github.com/mattn/go-isatty v0.0.24
+  # go: downloading modernc.org/memory v1.12.1
+  # go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+  # go: added github.com/dustin/go-humanize v1.0.1
+  # go: added github.com/google/uuid v1.6.0
+  # go: added github.com/mattn/go-isatty v0.0.24
+  # go: added github.com/ncruces/go-strftime v1.0.0
+  # go: added github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+  # go: added golang.org/x/sys v0.47.0
+  # go: added modernc.org/libc v1.75.6
+  # go: added modernc.org/mathutil v1.7.1
+  # go: added modernc.org/memory v1.12.1
+  # go: added modernc.org/sqlite v1.58.0
+
+cat go.mod
+  # module vsc.irc.ugent.be/itsupport/work-in-peace
+  # 
+  # go 1.26.5
+  # 
+  # require (
+  #         github.com/dustin/go-humanize v1.0.1 // indirect
+  #         github.com/google/uuid v1.6.0 // indirect
+  #         github.com/mattn/go-isatty v0.0.24 // indirect
+  #         github.com/ncruces/go-strftime v1.0.0 // indirect
+  #         github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+  #         golang.org/x/sys v0.47.0 // indirect
+  #         modernc.org/libc v1.75.6 // indirect
+  #         modernc.org/mathutil v1.7.1 // indirect
+  #         modernc.org/memory v1.12.1 // indirect
+  #         modernc.org/sqlite v1.58.0 // indirect
+  # )
 ```

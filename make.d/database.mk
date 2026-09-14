@@ -40,3 +40,28 @@ rpm/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | rpm
 
 rpm:
 	mkdir rpm
+
+# ============================================================================
+# SQLC CODEGEN
+# ============================================================================
+
+DB.SQLC.QUERY_SOURCES.DIR := sql/queries
+DB.SQLC.QUERY_SOURCES := $(shell find $(DB.SQLC.QUERY_SOURCES.DIR) -iname '*.sql')
+
+DB.SQLC.QUERY_TARGETS.DIR := internal/db
+DB.SQLC.QUERY_TARGETS := $(addprefix $(DB.SQLC.QUERY_TARGETS.DIR)/,$(addsuffix .go,$(notdir $(DB.SQLC.QUERY_SOURCES))))
+
+db.sql: $(DB.SQLC.QUERY_TARGETS)
+
+$(DB.SQLC.QUERY_TARGETS.DIR)/db.go: $(DB.SCHEMA_SOURCES) $(DB.SQLC.QUERY_SOURCES) sqlc.yaml
+	sqlc generate
+
+$(DB.SQLC.QUERY_TARGETS.DIR)/models.go: $(DB.SCHEMA_SOURCES) $(DB.SQLC.QUERY_SOURCES)
+	sqlc generate
+
+$(DB.SQLC.QUERY_TARGETS.DIR)/%.go: $(DB.SQLC.QUERY_SOURCES.DIR)/%
+	sqlc generate
+
+.PHONY: db.sql.clean
+db.sql.clean:
+	rm -rfv $(DB.SQLC.QUERY_TARGETS)
