@@ -5,11 +5,12 @@ set -ueo pipefail
 
 # ---------------------------------------------------------------------------- #
 
-@test "POST /alarm deadline=17:00" {
+@test "POST /alarm deadline='now + 5 seconds'" {
 
-# Directly submit to WiP (and not the proxy) so we can set the User data
-	description="bats[$$]: POST /alarm deadline=15:00"
-	deadline=$(date -d '17:00' '+%Y-%m-%d %H:%M:%S')
+	deadline=$(date -d 'now + 5 seconds' '+%Y-%m-%d %H:%M:%S')
+	description="bats[$$]: POST /alarm deadline=$deadline"
+
+	# Directly submit to WiP (and not the proxy) so we can set the User data
 	run -0 --separate-stderr wip_curl /alarm +ecode \
 		-H "REMOTE_USER: janed" \
 		-H "SSO_SUB: d2f9f861-496c-4639-6a1c-666a5a781406" \

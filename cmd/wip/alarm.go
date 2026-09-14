@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
@@ -31,7 +32,7 @@ func alarmPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	res, err := dbRW.InsertAlarm(ctx, db.InsertAlarmParams{
+	dbAlarm, err := dbRW.InsertAlarm(ctx, db.InsertAlarmParams{
 		User:        user.Username,
 		Datetime:    deadline,
 		Description: sql.NullString{String: description, Valid: description != ""},
@@ -42,7 +43,9 @@ func alarmPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//slog.Info("insert new timer", "result", res, "request", r)
-	slog.Info("insert new timer", "result", res)
+	slog.Info("DB: new alarm inserted", "db.Alarm", dbAlarm)
+
+	dispatch.Register(dbAlarm)
 }
 
 func init() {

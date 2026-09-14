@@ -35,3 +35,21 @@ func (q *Queries) InsertAlarm(ctx context.Context, arg InsertAlarmParams) (Alarm
 	)
 	return i, err
 }
+
+const selectAlarm = `-- name: SelectAlarm :one
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE alarm_id = ?
+`
+
+func (q *Queries) SelectAlarm(ctx context.Context, alarmID int64) (Alarm, error) {
+	row := q.db.QueryRowContext(ctx, selectAlarm, alarmID)
+	var i Alarm
+	err := row.Scan(
+		&i.AlarmID,
+		&i.User,
+		&i.CreatedAt,
+		&i.Deadline,
+		&i.CancelledAt,
+		&i.Description,
+	)
+	return i, err
+}
