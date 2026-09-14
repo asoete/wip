@@ -5,7 +5,7 @@ fmt:
 
 # Compile and run a DEV build
 .PHONY: run
-run: fmt
+run: fmt db.sql
 	WIP_CTL_TOKEN="$(CTL.TOKEN)" \
 		$(GO_FLAGS) $(GO) run -tags debug cmd/wip/*.go \
 			--ctl.address $(CTL.ADDRESS) \
