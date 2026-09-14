@@ -2,7 +2,13 @@ DB.SCHEMA_SOURCES := $(shell find sql/schema/ -iname '*.sql' | sort -V)
 
 .PHONY: db db.create db.migrate db.delete
 
-db: db.create db.migrate
+db: db.create db.migrate db.sql
+
+# ============================================================================
+# FILESYSTEM
+# ============================================================================
+
+db.reset: db.delete db
 
 db.open: | $(DB.SQLITE_FILE)
 	sqlite3 $(DB.SQLITE_FILE)
@@ -32,6 +38,10 @@ db.delete.no-confirm:
 
 # .PHONY: rpm.migrations
 # rpm.migrations: rpm/migrate.sh
+
+# ============================================================================
+# DIST MIGTATION
+# ============================================================================
 
 rpm/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | rpm
 	tools/bundle-migrations.sh \

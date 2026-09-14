@@ -5,44 +5,53 @@ set -ueo pipefail
 
 # ---------------------------------------------------------------------------- #
 
-@test "POST /timers deadline=15:00" {
+@test "POST /alarm deadline=17:00" {
 
-	wip_curl /timers -d deadline="15:00"
+# Directly submit to WiP (and not the proxy) so we can set the User data
+	description="bats[$$]: POST /alarm deadline=15:00"
+	deadline=$(date -d '17:00' '+%Y-%m-%d %H:%M:%S')
+	run -0 --separate-stderr wip_curl /alarm +ecode \
+		-H "REMOTE_USER: janed" \
+		-H "SSO_SUB: d2f9f861-496c-4639-6a1c-666a5a781406" \
+		-d deadline="$deadline" \
+		-d description="$description"
 
-	assert_equal "Status: 200" "${stderr_lines[0]}" \
-		"POST /timers returned invalid HTTP response code"
+	assert "Status: 200" = "${stderr_lines[-1]}" \
+		"POST /alarm returned invalid HTTP response code"
 
-	log "TEST HTTP Header Location="
-	test "${stderr_lines[1]}" = "Location:"
+	# ---
 
-	# -- Validate info is found in database
 	expected() {
-		json_fmt \
-			$(jo user_id=1 username=johnd sso_sub=0db52b4e-a61f-fc3f-58b4-d21c237151a1 ) \
-			$(jo user_id=2 username=janed sso_sub=0db52b4e-a61f-fc3f-58b4-d21c237151a1 )
+		json_fmt "$(jo deadline="$deadline" description="$description" )"
 	}
 
 	actual() {
-		sqlite_json "SELECT * FROM users"
+		sqlite_json "SELECT DATETIME(deadline, 'localtime') AS deadline,description FROM alarms WHERE description = '$description'"
 	}
 
 	diff expected actual
 
+	# ---
 
+	query() {
+		sqlite "$(printf "SELECT %s FROM alarms WHERE description = '$description' LIMIT 1" "$@")"
+	}
 
+	assert "$(query alarm_id)" != ""
+	assert "$(query alarm_id)" != "0"
+	echo $(query alarm_id) | grep -P '^\d+$'
 
-	# run -0 --separate-stderr \
-	# 	curl -vis --trace /dev/stdout "${BASE_URL}/timers" -d deadline="" \
-	# 	-w "%{stderr}Status: %{http_code}\nLocation: %{redirect_url}"
+	assert "$(query user)" != ""
+	assert "$(query user)" = "janed"
+	
+	assert "\
+		$(query "strftime('%s', created_at)")" '-gt' "$(date +%s -d 'now - 2 seconds')" \
+		"'created_at' timestamp is outside expected range (now - 3 secs)"
+	assert \
+		"$(query "strftime('%s', created_at)")" '-le' "$(date +%s -d 'now')" \
+		"'created_at' timestamp is outside expected range (timestamp is in the future??)"
 
-	# 	# test "${stderr_lines[0]}" = "Status: 200"
-	# 	test "${stderr_lines[1]}" = "Location:"
-
-
-	# 	assert_sqlite_json \
-	# 		"SELECT * FROM alarms ORDER BY alarm_id DESC LIMIT 1" \
-	# 		"==" \
-	# 		"$(jo alarm_id=1 owner_id=1 created_at=now deadline=15:00 cancelled_at="" )"
+	assert "$(query "DATETIME(deadline, 'localtime')")" = "$deadline"
+	assert "$(query cancelled_at)" = ""
+	assert "$(query description)" = "$description"
 }
-
-

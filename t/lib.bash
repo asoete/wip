@@ -14,7 +14,8 @@ function diff() {
 		--color always \
 		--override '*:JSON' \
 		--context 99 \
-		<($1) <($2)
+		--ignore-comments \
+		<(echo '// *** EXPECTED *** //' ; $1) <(echo '// *** RECEIVED *** //' ; $2)
 }
 
 # =============================================================================
@@ -117,8 +118,18 @@ function sqlite_json() {
 			printf "[SQLITE3 response]:  %s\n" "${result[@]}" 1>&2
 			false
 		}
+		printf "%s\n" "${result[@]}" | sed -e 's/^/[SQLITE3 response]: /' 1>&2
 	fi
 }
+
+function sqlite {
+
+	printf "[SQLITE3] : %s\n" "$*" 1>&2
+
+	sqlite3 "${DB_FILE}" "$@"
+
+}
+
 
 # =============================================================================
 # FMT
@@ -133,12 +144,34 @@ function json_fmt() {
 # ASSERT
 # =============================================================================
 
-function assert_equal() {
+function assert() {
 
-	test "$1" = "$2" || {
-		test -n "$3" && printf "  *** $3 *** \n"
-		printf "  ASSERT_EQUAL FAILED: \$1(%s) != \$2(%s)\n" "$1" "$2"
-		get_trace "\t |> "
+	if [ $# -lt 3 ] ; then
+		printf "assert() requires <\$left> <\$cmp> <\$right>" 1>&2
+		get_trace "\t |> " 1>&2
+		false
+	fi
+
+	printf "[ASSERT]: '%s' %s '%s'" "$1" "$2" "$3" 1>&2
+
+	left="$1" ; shift
+	cmp="$1" ; shift
+	right="$1" ; shift
+
+	test "$left" "$cmp" "$right" && {
+		printf " => <OK> \n"
+	} || {
+
+		printf " => <FAILED> \n"
+		if [ $# -gt 0 ] ; then
+			printf "ASSERTION ERROR: " 1>&2
+			printf "$@" 1>&2
+			printf "\n" 1>&2
+		fi
+
+		printf "  ASSERT FAILED: \$left(%s) \$cmp(%s) \$right(%s)\n" "$left" "$cmp" "$right" 1>&2
+		get_trace "\t |> " 1>&2
+
 		false
 	}
 }
@@ -173,4 +206,15 @@ function log() {
 	printf "[I] " 1>&2
 	printf "$@" 1>&2
 	printf "\n" 1>&2
+}
+
+# =============================================================================
+# MISC
+# =============================================================================
+
+function rid() {
+
+	n="${1:-3}"
+
+	base32 /dev/urandom | head -c $n
 }

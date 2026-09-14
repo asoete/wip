@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS alarms (
 	alarm_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	user TEXT,
-	created_at TEXT NOT NULL DEFAULT 'now',
+	user TEXT NOT NULL,
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	deadline TEXT NOT NULL,
 	cancelled_at TEXT,
-	description TEXT,
+	description TEXT
 );
 
 CREATE INDEX idx_alarms_user ON alarms(user);

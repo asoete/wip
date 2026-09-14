@@ -12,7 +12,7 @@ import (
 
 const insertAlarm = `-- name: InsertAlarm :one
 INSERT INTO alarms (user, deadline, description)
-VALUES (?, DATETIME(?,'localtime'), ?)
+VALUES (?, DATETIME(?, 'utc'), ?)
 RETURNING alarm_id, user, created_at, deadline, cancelled_at, description
 `
 
