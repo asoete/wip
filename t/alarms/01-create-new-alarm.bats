@@ -5,10 +5,14 @@ set -ueo pipefail
 
 # ---------------------------------------------------------------------------- #
 
-@test "POST /alarm deadline='now + 5 seconds'" {
+@test "POST /alarm deadline='now + 3 seconds'" {
 
-	deadline=$(date -d 'now + 5 seconds' '+%Y-%m-%d %H:%M:%S')
+	deadline=$(date -d 'now + 3 seconds' '+%Y-%m-%d %H:%M:%S')
+	deadline_epoch=$(date -d 'now + 3 seconds' '+%s')
 	description="bats[$$]: POST /alarm deadline=$deadline"
+
+	
+	# ----
 
 	# Directly submit to WiP (and not the proxy) so we can set the User data
 	run -0 --separate-stderr wip_curl /alarm +ecode \
@@ -55,4 +59,13 @@ set -ueo pipefail
 	assert "$(query "DATETIME(deadline, 'localtime')")" = "$deadline"
 	assert "$(query cancelled_at)" = ""
 	assert "$(query description)" = "$description"
+
+	# ----
+
+	since="$deadline_epoch" ntfy_wait -F "$description" | timeout 6 cat || {
+		printf "[FAIL]: ntfy_wait() timed out waiting for: '$description'\n" 1>&2
+		get_trace "\t |> " 1>&2
+		false
+	}
+
 }

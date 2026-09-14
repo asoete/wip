@@ -29,6 +29,7 @@ func (d *Dispatcher) Register(a db.Alarm) error {
 
 	f := func() {
 		slog.Warn("ALARM CALLBACK called", "db.Alarm", a)
+		sendAlert(a)
 	}
 
 	ttl, err := a.TTL()
