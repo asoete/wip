@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS alarms (
 	alarm_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	user TEXT NOT NULL,
-	created_at TEXT NOT NULL DEFAULT 'now',
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	deadline TEXT NOT NULL,
 	cancelled_at TEXT,
 	description TEXT
