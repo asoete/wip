@@ -1,0 +1,43 @@
+{{define "page.title"}}Hello from home{{end}}
+
+{{define "page.header"}}
+<p>
+	The current user is: {{.user.Username}}
+</p>
+{{end}}
+
+{{define "page.main"}}
+<h1>
+	<code>WiP</code>: Work in Peace
+</h1>
+
+<h2>
+	Active alarms
+</h2>
+<ul>
+	{{range $a := .alarms.active}}
+	<li>
+		{{template "component.alarm.as-ul" $a }}
+	</li>
+	{{else}}
+	<p>
+		No active alarms
+	</p>
+	{{end}}
+</ul>
+
+<h2>
+	Cancelled alarms
+</h2>
+<ul>
+	{{range $a := .alarms.cancelled}}
+	<li>
+		{{template "component.alarm.as-ul" $a }}
+	</li>
+	{{else}}
+	<p>
+		No active alarms
+	</p>
+	{{end}}
+</ul>
+{{end}}

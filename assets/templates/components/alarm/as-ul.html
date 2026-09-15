@@ -1,0 +1,14 @@
+{{ define  "component.alarm.as-ul" }}
+<ul class="alarm {{if .Overdue}}overdue{{end}}" style="font-family: monospace">
+	<li><span>ID</span>: {{.AlarmID}}</li>
+	<li><span>Created At</span>: {{.CreatedAt}}</li>
+	<li><span>Deadline</span>: {{.Deadline}}</li>
+	{{/* time.Second is not available in this template. Use the expanded value: 1000000000 */}}
+	<li><span>TTL</span>: {{.TTL.Round 1000000000 }}</li>
+	<li><span>Cancelled At</span>: {{.CancelledAt.String}}</li>
+	<li><span>Description</span>: {{.Description.String}}</li>
+	{{if .Overdue}}
+	<li style="color:darkred; font-weight: bold;"><span style="background: darkred; color:white;">OVERDUE</span>: Alerting...</li>
+	{{end}}
+</ul>
+{{end}}

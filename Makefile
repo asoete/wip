@@ -15,6 +15,7 @@ default: wip.bin docs
 
 WIP.BIN := bin/wip
 WIP.SOURCES := $(shell find -type f -name "*.go" -not -path "./cmd/auth-proxy-mock/*")
+WIP.TEMPLATES := $(shell find assets/templates -type f)
 
 # == RUN/SERVER variables ==
 # ============================================================================

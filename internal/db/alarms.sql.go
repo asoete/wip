@@ -56,6 +56,108 @@ func (q *Queries) InsertAlarm(ctx context.Context, arg InsertAlarmParams) (Alarm
 	return i, err
 }
 
+const listActiveUserAlarms = `-- name: ListActiveUserAlarms :many
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC
+`
+
+func (q *Queries) ListActiveUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
+	rows, err := q.db.QueryContext(ctx, listActiveUserAlarms, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Alarm
+	for rows.Next() {
+		var i Alarm
+		if err := rows.Scan(
+			&i.AlarmID,
+			&i.User,
+			&i.CreatedAt,
+			&i.Deadline,
+			&i.CancelledAt,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCancelledUserAlarms = `-- name: ListCancelledUserAlarms :many
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL
+`
+
+func (q *Queries) ListCancelledUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
+	rows, err := q.db.QueryContext(ctx, listCancelledUserAlarms, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Alarm
+	for rows.Next() {
+		var i Alarm
+		if err := rows.Scan(
+			&i.AlarmID,
+			&i.User,
+			&i.CreatedAt,
+			&i.Deadline,
+			&i.CancelledAt,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUserAlarms = `-- name: ListUserAlarms :many
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ?
+`
+
+func (q *Queries) ListUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
+	rows, err := q.db.QueryContext(ctx, listUserAlarms, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Alarm
+	for rows.Next() {
+		var i Alarm
+		if err := rows.Scan(
+			&i.AlarmID,
+			&i.User,
+			&i.CreatedAt,
+			&i.Deadline,
+			&i.CancelledAt,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const selectAlarm = `-- name: SelectAlarm :one
 SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE alarm_id = ?
 `

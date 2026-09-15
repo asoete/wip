@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+		<title>
+			{{block "page.title" . }} WiP | Work in Peace ⏰ {{end}}
+		</title>
+		<style>
+		ul.alarm {
+			padding: 0;
+			margin: 0;
+			margin-bottom: 3px;
+		}
+		ul.alarm li {
+			display: inline-block;
+			margin: 0px 3px;
+			padding-right: 3px;
+			border: solid #ddd 1px;
+			border-radius: 3px;
+		}
+		ul.alarm.overdue {
+			border-left: solid darkred 5px;
+		}
+		ul.alarm span {
+			background: #eee;
+			padding: 0px 3px;
+			border-radius: 3px;
+		}
+		</style>
+	</head>
+	<body>
+		<header>
+			{{block "page.header" . }}{{end}}
+		</header>
+		<main>
+			{{block "page.main" . }}{{end}}
+		</main>
+		<footer>
+			{{block "page.footer" . }}{{end}}
+		</footer>
+	</body>
+</html>
