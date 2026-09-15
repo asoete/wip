@@ -10,6 +10,26 @@ import (
 	"database/sql"
 )
 
+const cancelAlarm = `-- name: CancelAlarm :one
+UPDATE alarms SET cancelled_at = DATETIME('now')
+WHERE alarm_id = ?
+RETURNING alarm_id, user, created_at, deadline, cancelled_at, description
+`
+
+func (q *Queries) CancelAlarm(ctx context.Context, alarmID int64) (Alarm, error) {
+	row := q.db.QueryRowContext(ctx, cancelAlarm, alarmID)
+	var i Alarm
+	err := row.Scan(
+		&i.AlarmID,
+		&i.User,
+		&i.CreatedAt,
+		&i.Deadline,
+		&i.CancelledAt,
+		&i.Description,
+	)
+	return i, err
+}
+
 const insertAlarm = `-- name: InsertAlarm :one
 INSERT INTO alarms (user, deadline, description)
 VALUES (?, DATETIME(?, 'utc'), ?)
