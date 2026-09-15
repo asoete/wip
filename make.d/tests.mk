@@ -59,7 +59,7 @@ endef
 tests.alarms: $(TESTS_DIR)/alarms
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags) -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-alarms) \
+		DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-alarms) \
 		tests.env \
 		tests.newdb \
 		tests.seeds \
@@ -69,21 +69,21 @@ tests.alarms: $(TESTS_DIR)/alarms
 tests.config:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-config) \
+		DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-config) \
 		--tests.run suite=config
 	$(call print-end-make-target)
 
 tests.env:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) \
+		DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-env) \
 		--tests.run suite=env
 	$(call print-end-make-target)
 
 tests.help:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-help) \
+		DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-help) \
 		--tests.run suite=help
 	$(call print-end-make-target)
 
@@ -95,7 +95,7 @@ tests.help:
 tests.seeds:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		$(intcmp $(MAKELEVEL),1,DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-seeds) ) \
+		$(intcmp $(MAKELEVEL),1,DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-seeds) ) \
 		$(intcmp $(MAKELEVEL),1,tests.newdb) \
 		--tests.run suite=seeds
 	$(call print-end-make-target)
@@ -103,7 +103,7 @@ tests.seeds:
 tests.users:
 	$(call print-start-make-target)
 	$(MAKE) $(make.tests.flags)  -- \
-		DB.SQLITE_FILE=$(call tests.newdb.file.namespace-with,testing-users) \
+		DB.SQLITE_FILE?=$(call tests.newdb.file.namespace-with,testing-users) \
 		tests.newdb \
 		--tests.run suite=users
 	$(call print-end-make-target)

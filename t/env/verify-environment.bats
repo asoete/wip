@@ -82,6 +82,7 @@ load "../lib.bash"
 
 @test "verify_environment: ensure DB_FILE is defined" {
 
+	printf "DB_FILE=%s\n" "${DB_FILE}" 1>&2
 	test -n "${DB_FILE}"
 }
 
