@@ -11,7 +11,7 @@ SELECT * FROM alarms WHERE cancelled_at IS NULL;
 SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC;
 
 -- name: ListCancelledUserAlarms :many
-SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL;
+SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL ORDER BY deadline DESC;
 
 -- name: InsertAlarm :one
 INSERT INTO alarms (user, deadline, description)
