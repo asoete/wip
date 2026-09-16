@@ -1,8 +1,10 @@
 package dispatch
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
@@ -16,6 +18,14 @@ type Dispatcher struct {
 var defaultDispatcher Dispatcher = Dispatcher{
 	alarms: make(map[int64]db.Alarm),
 	timers: make(map[int64]*time.Timer),
+}
+
+// ---------------------------------------------------------------------------
+// FACADES
+// ---------------------------------------------------------------------------
+
+func Resume(dbqs *db.Queries) error {
+	return defaultDispatcher.Resume(dbqs)
 }
 
 func Register(a db.Alarm) error {
@@ -44,6 +54,26 @@ func GetAlarms() map[int64]db.Alarm {
 
 func GetTimers() map[int64]*time.Timer {
 	return defaultDispatcher.GetTimers()
+}
+
+// ---------------------------------------------------------------------------
+// IMPLEMENTATION
+// ---------------------------------------------------------------------------
+
+func (d *Dispatcher) Resume(dbqs *db.Queries) error {
+
+	ctx := context.Background()
+	list, err := dbqs.ListActiveAlarms(ctx)
+	if err != nil {
+		slog.Error("unable to boot dispatch: loading active alarms failed", "error", err)
+		os.Exit(2)
+	}
+
+	for _, a := range list {
+		d.Register(a)
+	}
+
+	return nil
 }
 
 // ---------------------------------------------------------------------------

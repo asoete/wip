@@ -4,6 +4,9 @@ SELECT * FROM alarms WHERE alarm_id = ?;
 -- name: ListUserAlarms :many
 SELECT * FROM alarms WHERE user = ?;
 
+-- name: ListActiveAlarms :many
+SELECT * FROM alarms WHERE cancelled_at IS NULL;
+
 -- name: ListActiveUserAlarms :many
 SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC;
 

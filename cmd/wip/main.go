@@ -14,6 +14,7 @@ import (
 
 	_ "modernc.org/sqlite"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 )
 
 // flags
@@ -127,6 +128,8 @@ func main() {
 	}
 
 	dbRW = db.New(dbhandle)
+
+	dispatch.Resume(dbRW)
 
 	// Start (separate) server to listen for control commands
 	go func() {

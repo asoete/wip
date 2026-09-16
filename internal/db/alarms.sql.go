@@ -56,6 +56,40 @@ func (q *Queries) InsertAlarm(ctx context.Context, arg InsertAlarmParams) (Alarm
 	return i, err
 }
 
+const listActiveAlarms = `-- name: ListActiveAlarms :many
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE cancelled_at IS NULL
+`
+
+func (q *Queries) ListActiveAlarms(ctx context.Context) ([]Alarm, error) {
+	rows, err := q.db.QueryContext(ctx, listActiveAlarms)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Alarm
+	for rows.Next() {
+		var i Alarm
+		if err := rows.Scan(
+			&i.AlarmID,
+			&i.User,
+			&i.CreatedAt,
+			&i.Deadline,
+			&i.CancelledAt,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listActiveUserAlarms = `-- name: ListActiveUserAlarms :many
 SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC
 `
@@ -91,7 +125,7 @@ func (q *Queries) ListActiveUserAlarms(ctx context.Context, user string) ([]Alar
 }
 
 const listCancelledUserAlarms = `-- name: ListCancelledUserAlarms :many
-SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL
+SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL ORDER BY deadline DESC
 `
 
 func (q *Queries) ListCancelledUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
