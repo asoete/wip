@@ -36,6 +36,16 @@ func GetTimer(id int64) (*time.Timer, bool) {
 	return defaultDispatcher.GetTimer(id)
 }
 
+// ---
+
+func GetAlarms() map[int64]db.Alarm {
+	return defaultDispatcher.GetAlarms()
+}
+
+func GetTimers() map[int64]*time.Timer {
+	return defaultDispatcher.GetTimers()
+}
+
 // ---------------------------------------------------------------------------
 
 func (d *Dispatcher) Register(a db.Alarm) error {
@@ -99,4 +109,14 @@ func (d *Dispatcher) GetAlarm(id int64) (db.Alarm, bool) {
 func (d *Dispatcher) GetTimer(id int64) (*time.Timer, bool) {
 	timer, found := d.timers[id]
 	return timer, found
+}
+
+// ---------------------------------------------------------------------------
+
+func (d *Dispatcher) GetAlarms() map[int64]db.Alarm {
+	return d.alarms
+}
+
+func (d *Dispatcher) GetTimers() map[int64]*time.Timer {
+	return d.timers
 }
