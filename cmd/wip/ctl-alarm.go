@@ -12,6 +12,12 @@ import (
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 )
 
+// ----------------------------------------------------------------------------
+
+func init() {
+	ctlMux.HandleFunc("GET /ctl/alarm/{id}/dispatch-has-alarm", ctlAlarmDispatchHasAlarm)
+}
+
 func ctlAlarmDispatchHasAlarm(w http.ResponseWriter, r *http.Request) {
 
 	alarm_id_str := r.PathValue("id")
@@ -25,6 +31,12 @@ func ctlAlarmDispatchHasAlarm(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, strconv.FormatBool(ok))
 }
 
+// ----------------------------------------------------------------------------
+
+func init() {
+	ctlMux.HandleFunc("GET /ctl/alarm/{id}/dispatch-has-timer", ctlAlarmDispatchHasTimer)
+}
+
 func ctlAlarmDispatchHasTimer(w http.ResponseWriter, r *http.Request) {
 
 	alarm_id_str := r.PathValue("id")
@@ -36,9 +48,4 @@ func ctlAlarmDispatchHasTimer(w http.ResponseWriter, r *http.Request) {
 	_, ok := dispatch.GetTimer(alarm_id)
 
 	fmt.Fprint(w, strconv.FormatBool(ok))
-}
-
-func init() {
-	ctlMux.HandleFunc("GET /ctl/alarm/{id}/dispatch-has-alarm", ctlAlarmDispatchHasAlarm)
-	ctlMux.HandleFunc("GET /ctl/alarm/{id}/dispatch-has-timer", ctlAlarmDispatchHasTimer)
 }
