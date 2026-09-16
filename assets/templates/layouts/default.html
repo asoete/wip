@@ -6,25 +6,55 @@
 			{{block "page.title" . }} WiP | Work in Peace ⏰ {{end}}
 		</title>
 		<style>
+		body {
+			font-family: sans-serif;
+		}
 		ul.alarm {
 			padding: 0;
 			margin: 0;
 			margin-bottom: 3px;
+			display: flex;
+			flex-wrap: wrap;
 		}
 		ul.alarm li {
 			display: inline-block;
+			flex-grow: 1;
 			margin: 0px 3px;
 			padding-right: 3px;
 			border: solid #ddd 1px;
 			border-radius: 3px;
 		}
-		ul.alarm.overdue {
-			border-left: solid darkred 5px;
-		}
-		ul.alarm span {
+		.alarm span {
 			background: #eee;
 			padding: 0px 3px;
+			border-top-left-radius: 3px;
+			border-bottom-left-radius: 3px;
+			font-style: italic;
+			display: inline-block;
+			height: 100%;
+		}
+		table.alarm {
+			width: 100%;
+			border-collapse: collapse;
+		}
+		table.alarm td {
+			margin: 0px 0px;
+			padding: 3px;
+			padding-left: 0px;
+			border: solid #ddd 1px;
 			border-radius: 3px;
+				position: relative;
+		}
+		.alarm {
+			border-left: solid lightgreen 5px;
+		}
+		.alarm.overdue {
+			border-left: solid darkred 5px;
+			color: darkred;
+			font-weight: bold;
+		}
+		table.alarm.cancelled tr {
+			border-left: solid lightgrey 5px;
 		}
 		</style>
 	</head>

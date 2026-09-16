@@ -1,5 +1,3 @@
-{{define "page.title"}}Hello from home{{end}}
-
 {{define "page.header"}}
 <p>
 	The current user is: {{.user.Username}}
@@ -12,8 +10,46 @@
 </h1>
 
 <h2>
+	Start new alarm
+</h2>
+
+<style>
+form {
+	display: flex;
+}
+
+form input, form button {
+	margin: 0 1em;
+}
+form input[type="text"]{
+	flex-grow: 1;
+}
+</style>
+
+<form action="/alarm" method="POST">
+	Deadline:
+	<input
+		required
+		type="datetime-local"
+		name="deadline"
+		value="{{.new_alarm.proposed_datetime}}"
+		{{/* min="{{.new_alarm.min_datetime}}" */}}
+		{{/* step="900" */}} >
+
+	<input
+		type="text"
+		name="description"
+		Value="{{.proposed_description}}"
+		placeholder="Description..." >
+
+	<button type="submit" name="alarm" value="start">Start a new alarm</button>
+</form>
+
+
+<h2>
 	Active alarms
 </h2>
+{{/*
 <ul>
 	{{range $a := .alarms.active}}
 	<li>
@@ -25,10 +61,17 @@
 	</p>
 	{{end}}
 </ul>
+*/}}
+<table class="alarm">
+	{{range $a := .alarms.active}}
+		{{template "component.alarm.as-tr" $a }}
+	{{end}}
+<table>
 
 <h2>
 	Cancelled alarms
 </h2>
+{{/*
 <ul>
 	{{range $a := .alarms.cancelled}}
 	<li>
@@ -40,4 +83,10 @@
 	</p>
 	{{end}}
 </ul>
+*/}}
+<table class="alarm cancelled">
+	{{range $a := .alarms.cancelled}}
+		{{template "component.alarm.as-tr" $a }}
+	{{end}}
+<table>
 {{end}}

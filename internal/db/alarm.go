@@ -6,7 +6,16 @@ import (
 	"time"
 )
 
+func (a Alarm) IsCancelled() bool {
+
+	return a.CancelledAt.Valid
+}
+
 func (a Alarm) TTL() (time.Duration, error) {
+
+	if a.IsCancelled() {
+		return time.Duration(0), nil
+	}
 
 	deadline_t, err := time.Parse(time.DateTime, a.Deadline)
 
@@ -17,6 +26,7 @@ func (a Alarm) TTL() (time.Duration, error) {
 
 	return time.Until(deadline_t), nil
 }
+
 func (a Alarm) Overdue() (bool, error) {
 
 	ttl, err := a.TTL()
@@ -25,5 +35,5 @@ func (a Alarm) Overdue() (bool, error) {
 		return false, fmt.Errorf("db.Alarm.Overdue() failed: retrieving TTL failed: %w", err)
 	}
 
-	return ttl <= 0 && !a.CancelledAt.Valid, nil
+	return ttl <= 0 && !a.IsCancelled(), nil
 }

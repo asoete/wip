@@ -54,6 +54,8 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 	slog.Info("DB: new alarm inserted", "db.Alarm", dbAlarm)
 
 	dispatch.Register(dbAlarm)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 // ---------------------------------------------------------------------------
