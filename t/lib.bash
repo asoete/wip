@@ -151,7 +151,7 @@ function ntfy_wait() {
 
 	since="${since:-latest}"
 
-	url="https://ntfy.sh/WiP-testing-channel_OfTD36Z4uARQeJsQB76pNQMoloPv/json?poll=1&since=$since"
+	url="https://msg.irc.ugent.be:1443/WiP-devchannel-PxLeA/json?poll=1&since=$since"
 
 	while ! curl_wrapped "${url}" | grep "$@" ; do
 
