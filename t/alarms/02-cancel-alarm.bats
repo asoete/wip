@@ -20,7 +20,7 @@ set -ueo pipefail
 		-d deadline="$deadline" \
 		-d description="$description"
 
-	assert "Status: 200" = "${stderr_lines[-1]}" \
+	assert "Status: 303" = "${stderr_lines[-1]}" \
 		"POST /alarm returned invalid HTTP response code"
 
 	# ---
