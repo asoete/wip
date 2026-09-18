@@ -68,4 +68,13 @@ set -ueo pipefail
 		false
 	}
 
+	# ---
+
+	alarm_id="$(query alarm_id)" 
+	run -0 --separate-stderr wip_curl /alarm/${alarm_id}/cancel +ecode \
+		-X POST \
+		-H "REMOTE_USER: janed" \
+		-H "SSO_SUB: d2f9f861-496c-4639-6a1c-666a5a781406"
+
+
 }
