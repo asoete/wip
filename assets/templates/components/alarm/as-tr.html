@@ -1,9 +1,18 @@
 {{ define  "component.alarm.as-tr" }}
 <tr class="alarm {{if .Overdue}}overdue{{end}}" style="font-family: monospace">
 	<td><span>ID</span> {{.AlarmID}}</td>
-	<td><span>Created At</span> {{.CreatedAt}}</td>
-	<td><span>Deadline</span> {{.Deadline}}</td>
-	<td><span>Cancelled At</span> {{.CancelledAt.String}}</td>
+	<td>
+		<span>Created At</span>
+		<time datetime="{{.CreatedAt}}" >{{.CreatedAt}}</time>
+	</td>
+	<td>
+		<span>Deadline</span>
+		<time datetime="{{.Deadline}}" >{{.Deadline}}</time>
+	</td>
+	<td>
+		<span>Cancelled At</span>
+		<time datetime="{{.CancelledAt.String}}" >{{.CancelledAt.String}}</time>
+	</td>
 	<td><span>Description</span> {{.Description.String}}</td>
 	{{/* time.Second is not available in this template. Use the expanded value: 1000000000 */}}
 	{{if not .IsCancelled}}
