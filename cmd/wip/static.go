@@ -8,5 +8,6 @@ import (
 
 func init() {
 
+	http.Handle("/fonts/", http.FileServerFS(embedder.Fonts))
 	http.Handle("/images/", http.FileServerFS(embedder.Images))
 }
