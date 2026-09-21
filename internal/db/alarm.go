@@ -17,7 +17,7 @@ func (a Alarm) TTL() (time.Duration, error) {
 		return time.Duration(0), nil
 	}
 
-	deadline_t, err := time.Parse(time.DateTime, a.Deadline)
+	deadline_t, err := a.DeadlineTime()
 
 	// TODO: better error handling /propagation
 	if err != nil {
@@ -25,6 +25,39 @@ func (a Alarm) TTL() (time.Duration, error) {
 	}
 
 	return time.Until(deadline_t), nil
+}
+
+func (a Alarm) CreatedAtTime() (time.Time, error) {
+
+	created_at_t, err := time.Parse(time.DateTime, a.CreatedAt)
+
+	if err != nil {
+		return time.Now(), fmt.Errorf("converting db.Alarm.CreatedAt to time.Time failed: %w", err)
+	}
+
+	return created_at_t, nil
+}
+
+func (a Alarm) DeadlineTime() (time.Time, error) {
+
+	deadline_t, err := time.Parse(time.DateTime, a.Deadline)
+
+	if err != nil {
+		return time.Now(), fmt.Errorf("converting db.Alarm.Deadline to time.Time failed: %w", err)
+	}
+
+	return deadline_t, nil
+}
+
+func (a Alarm) CancelledAtTime() (time.Time, error) {
+
+	cancelled_at_t, err := time.Parse(time.DateTime, a.CancelledAt.String)
+
+	if err != nil {
+		return time.Now(), fmt.Errorf("converting db.Alarm.CancelledAt to time.Time failed: %w", err)
+	}
+
+	return cancelled_at_t, nil
 }
 
 func (a Alarm) Overdue() (bool, error) {

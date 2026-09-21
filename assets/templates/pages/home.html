@@ -1,92 +1,48 @@
 {{define "page.header"}}
-<p>
-	The current user is: {{.user.Username}}
-</p>
+
+<div class="hero">
+	<image src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+	<h1>Work in Peace</h1>
+</div>
+
+<nav class="nav sm-dp-none">
+	<ul>
+		<li>
+			<a href="#">Home</a>
+		</li>
+		<li>
+			<a href="#">My Channels</a>
+		</li>
+		<li>
+			<a href="#">Eventlog</a>
+		</li>
+	</ul>
+</nav>
+
+<div class="userinfo sm-dp-none">
+	{{.user.Username}}
+</div>
 {{end}}
 
 {{define "page.main"}}
-<h1>
-	<code>WiP</code>: Work in Peace
-</h1>
-
-<h2>
-	Start new alarm
-</h2>
-
-<style>
-form {
-	display: flex;
-}
-
-form input, form button {
-	margin: 0 1em;
-}
-form input[type="text"]{
-	flex-grow: 1;
-}
-</style>
-
-<form action="/alarm" method="POST">
-	Deadline:
-	<input
-		required
-		type="datetime-local"
-		name="deadline"
-		value="{{.new_alarm.proposed_datetime}}"
-		{{/* min="{{.new_alarm.min_datetime}}" */}}
-		{{/* step="900" */}} >
-
-	<input
-		type="text"
-		name="description"
-		Value="{{.proposed_description}}"
-		placeholder="Description..." >
-
-	<button type="submit" name="alarm" value="start">Start a new alarm</button>
-</form>
 
 
-<h2>
-	Active alarms
-</h2>
-{{/*
-<ul>
-	{{range $a := .alarms.active}}
-	<li>
-		{{template "component.alarm.as-ul" $a }}
-	</li>
-	{{else}}
-	<p>
-		No active alarms
-	</p>
-	{{end}}
-</ul>
-*/}}
-<table class="alarm">
-	{{range $a := .alarms.active}}
-		{{template "component.alarm.as-tr" $a }}
-	{{end}}
-<table>
+<h2>Active Alarms</h2>
+{{range $a := .alarms.active}}
+	{{template "component.alarm.card" $a }}
+{{else}}
+<div class="value-na">
+No Active alarms
+</div>
+{{end}}
 
-<h2>
-	Cancelled alarms
-</h2>
-{{/*
-<ul>
-	{{range $a := .alarms.cancelled}}
-	<li>
-		{{template "component.alarm.as-ul" $a }}
-	</li>
-	{{else}}
-	<p>
-		No active alarms
-	</p>
-	{{end}}
-</ul>
-*/}}
-<table class="alarm cancelled">
-	{{range $a := .alarms.cancelled}}
-		{{template "component.alarm.as-tr" $a }}
-	{{end}}
-<table>
+<h2>My Recent History</h2>
+{{range $a := .alarms.cancelled}}
+	{{template "component.alarm.card" $a }}
+{{else}}
+<div class="value-na">
+No History
+</div>
+{{end}}
+
 {{end}}

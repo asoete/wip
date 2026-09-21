@@ -1,61 +1,170 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
 		<title>
 			{{block "page.title" . }} WiP | Work in Peace ⏰ {{end}}
 		</title>
 		<style>
 		body {
+			padding: 0;
+			margin:0;
+			background: #eee;
 			font-family: sans-serif;
 		}
-		ul.alarm {
-			padding: 0;
-			margin: 0;
-			margin-bottom: 3px;
+		header {
+			background: white;
+			padding: 0.5em 0.25em;
+			box-shadow: 0px 0px 5px #888;
 			display: flex;
-			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+
+			.hero {
+				display: flex;
+				img {
+					height: 2em;
+				}
+
+				h1 {
+					margin: 0 0.5em;
+					font-family: monospace;
+					font-size: 1.75em;
+					font-size: 2em;
+					word-spacing: -0.3em;
+				}
+			}
+
+			nav {
+
+				ul {
+					padding: 0;
+					margin: 0;
+					li {
+						display: inline-block;
+						padding: 0 1em;
+					}
+				}
+			}
+
+			.userinfo {
+				padding: 0 1em;
+				display: inline-block;
+				text-align: right;
+			}
 		}
-		ul.alarm li {
-			display: inline-block;
-			flex-grow: 1;
-			margin: 0px 3px;
-			padding-right: 3px;
-			border: solid #ddd 1px;
-			border-radius: 3px;
+
+		main {
+			max-width: 1024px;
+			margin: 0 auto;
 		}
-		.alarm span {
-			background: #eee;
-			padding: 0px 3px;
-			border-top-left-radius: 3px;
-			border-bottom-left-radius: 3px;
-			font-style: italic;
-			display: inline-block;
-			height: 100%;
+
+		h2 {
+			margin: 0.5em;
+			margin-top: 1em;
+			border-bottom: solid #ddd 1px;
+			color: rgba(0,0,0,0.7);
+			font-size: 1.3em;
 		}
-		table.alarm {
-			width: 100%;
-			border-collapse: collapse;
-		}
-		table.alarm td {
-			margin: 0px 0px;
-			padding: 3px;
-			padding-left: 0px;
-			border: solid #ddd 1px;
-			border-radius: 3px;
-				position: relative;
-		}
-		.alarm {
-			border-left: solid lightgreen 5px;
-		}
-		.alarm.overdue {
-			border-left: solid darkred 5px;
-			color: darkred;
+		.value-na {
 			font-weight: bold;
+			font-style: italic;
+			color: rgba(1,0,0,0.1);
+			padding: 0.25em 1em;
+			margin-top: 0.25em;
+			margin-bottom: -0.25em;
+			text-align: center;
 		}
-		table.alarm.cancelled tr {
-			border-left: solid lightgrey 5px;
+		.alarm-card {
+			background: white;
+			padding: 0.5em;
+			margin: 1em 0.5em;
+			border-radius: 5px;
+			box-shadow: 3px 3px 5px #ddd;
+
+			.head{
+				display: flex;
+				align-items: center;
+				background: #f8f8f8;
+				margin: -0.5em;
+				margin-bottom: 0.5em;
+					padding: 0.25em 0.5em;
+				border-top-left-radius: 5px;
+				border-top-right-radius: 5px;
+
+				.id {
+					font-family: monospace;
+					background: #eee;
+					padding: 0.25em 0.5em;
+					margin: 0.25em;
+					margin-right: 0.5em;
+					border-radius: 5px;;
+				}
+
+				.description {
+					font-weight: 500;;
+					font-style: italic;
+					color: #666
+				}
+			}
+			.body {
+				display: flex;
+				flex-wrap: wrap;
+			}
+			.keyval {
+
+				display: inline-block;
+				/* background: #f8f8f8; */
+				border: solid #f0f0f0 1px;
+				padding: 0.25em;
+				margin: 0.25em;
+				border-radius: 5px;;
+				flex: 1 1 auto;
+
+				label {
+					display: block;
+					font-size: 0.6em;
+					font-weight: bold;
+					color: rgba(0,0,0,0.5);
+					/* text-decoration: underline; */
+					margin-bottom: -0.5em;
+
+					svg {
+						height: 1em;
+						margin-bottom: -1px;;
+					}
+				}
+
+				label + * {
+					font-family: monospace;
+					word-spacing: -0.3em;
+				}
+			}
 		}
+		@media screen and (max-width: 576px) {
+			/*
+			body {
+				background-color: pink;
+			}
+			*/
+			.alarm-card .body .keyval {
+				flex: 1 1 calc(45%);
+			}
+			.sm-dp-none {
+				display: none;
+				visibility: hidden;
+				width: 0px;
+				height: 0px;
+			}
+		}
+		/*
+		@media screen and (min-width: 576px) and (max-width: 768px) {
+			body {
+				background-color: lightgreen;
+			}
+		}
+		*/
 		</style>
 	</head>
 	<body>

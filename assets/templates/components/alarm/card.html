@@ -1,0 +1,47 @@
+{{define "component.alarm.card"}}
+<div class="alarm-card">
+	<div class="head">
+		<div class="id">
+		#{{.AlarmID}}
+		</div>
+		<div class="description">
+		{{.Description.String}}
+		</div>
+	</div>
+
+	<div class="body">
+		<div class="started keyval" title="{{.CreatedAt}}">
+			<label>{{template "icon.play-circle"}} Created:</label>
+			<time datetime="{{.CreatedAt}}">
+				<span>{{.CreatedAtTime.Format "Mon Jan _2"}}</span>
+				<b>{{.CreatedAtTime.Format "15:04"}}</b>
+			</time>
+		</div>
+
+		<div class="deadline keyval" title="{{.Deadline}}">
+			<label>{{template "icon.bell-alert"}} Deadline:</label>
+			<time datetime="{{.Deadline}}">
+				<span>{{.DeadlineTime.Format "Mon Jan _2"}}</span>
+				<b>{{.DeadlineTime.Format "15:04"}}</b>
+			</time>
+		</div>
+
+		<div class="cancelled keyval" title="{{.CancelledAt}}">
+			<label>{{template "icon.stop-circle"}} Cancelled:</label>
+			{{if .CancelledAt.Valid}}
+			<time datetime="{{.CancelledAt}}">
+				<span>{{.CancelledAtTime.Format "Mon Jan _2"}}</span>
+				<b>{{.CancelledAtTime.Format "15:04"}}</b>
+			</time>
+			{{else}}
+			<div class="value-na">N/A</div>
+			{{end}}
+		</div>
+
+		<div class="channel keyval" title="">
+			<label>{{template "icon.queue-list"}} Channel</label>
+			<time>Lab Lambrecht</time>
+		</div>
+	</div>
+</div>
+{{end}}

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"html/template"
-	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -24,8 +23,8 @@ func init() {
 	homePage = template.Must(template.ParseFiles(
 		"assets/templates/layouts/default.html",
 		"assets/templates/pages/home.html",
-		"assets/templates/components/alarm/as-ul.html",
-		"assets/templates/components/alarm/as-tr.html",
+		"assets/templates/components/alarm/card.html",
+		"assets/templates/icons.html",
 	))
 }
 
@@ -42,17 +41,18 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		slog.Error("unable to retrieve active user alarms", "user", user, "error", err)
 	}
 
-	log.Printf("user: %+v\n", user)
-	log.Printf("activeAlarms: %+v\n", activeAlarms)
-
 	cancelledAlarms, err := dbRW.ListCancelledUserAlarms(ctx, user.Username)
 	if err != nil {
 		slog.Error("unable to retrieve cancelled user alarms", "user", user, "error", err)
 	}
 
+	// log.Printf("user: %+v\n", user)
+	// log.Printf("activeAlarms: %+v\n", activeAlarms)
+	// log.Printf("cancelledAlarms: %+v\n", cancelledAlarms)
+
 	proposed_datetime := time.Now().Add(time.Hour * 2).Truncate(time.Hour)
 
-	homePage.Execute(w, map[string]any{
+	err = homePage.Execute(w, map[string]any{
 		"user": user,
 		"new_alarm": map[string]any{
 			"proposed_datetime": proposed_datetime.Format("2006-01-02 15:04"),
@@ -63,4 +63,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 			"cancelled": cancelledAlarms,
 		},
 	})
+
+	if err != nil {
+		slog.Error("rendering homePage failed", "error", err)
+	}
 }
