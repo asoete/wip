@@ -80,4 +80,6 @@ func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dispatch.Cancel(dbAlarm)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

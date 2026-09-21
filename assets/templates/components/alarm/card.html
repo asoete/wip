@@ -1,23 +1,19 @@
 {{define "component.alarm.card"}}
-<div class="alarm-card">
+<div class="alarm-card {{if .Overdue}}overdue{{end}}">
 	<div class="head">
 		<div class="id">
 		#{{.AlarmID}}
 		</div>
 		<div class="description">
+		{{if .Overdue}}
+			{{template "icon.bell-alert"}}
+		{{end}}
+
 		{{.Description.String}}
 		</div>
 	</div>
 
 	<div class="body">
-		<div class="started keyval" title="{{.CreatedAt}}">
-			<label>{{template "icon.play-circle"}} Created:</label>
-			<time datetime="{{.CreatedAt}}">
-				<span>{{.CreatedAtTime.Format "Mon Jan _2"}}</span>
-				<b>{{.CreatedAtTime.Format "15:04"}}</b>
-			</time>
-		</div>
-
 		<div class="deadline keyval" title="{{.Deadline}}">
 			<label>{{template "icon.bell-alert"}} Deadline:</label>
 			<time datetime="{{.Deadline}}">
@@ -26,6 +22,20 @@
 			</time>
 		</div>
 
+		<div class="channel keyval" title="">
+			<label>{{template "icon.queue-list"}} Channel</label>
+			<time>Lab Lambrecht</time>
+		</div>
+
+		<div class="started keyval" title="{{.CreatedAt}}">
+			<label>{{template "icon.play-circle"}} Created:</label>
+			<time datetime="{{.CreatedAt}}">
+				<span>{{.CreatedAtTime.Format "Mon Jan _2"}}</span>
+				<b>{{.CreatedAtTime.Format "15:04"}}</b>
+			</time>
+		</div>
+
+		{{if .IsCancelled}}
 		<div class="cancelled keyval" title="{{.CancelledAt}}">
 			<label>{{template "icon.stop-circle"}} Cancelled:</label>
 			{{if .CancelledAt.Valid}}
@@ -37,11 +47,50 @@
 			<div class="value-na">N/A</div>
 			{{end}}
 		</div>
-
-		<div class="channel keyval" title="">
-			<label>{{template "icon.queue-list"}} Channel</label>
-			<time>Lab Lambrecht</time>
-		</div>
+		{{else}}
+		<form class="cancel-keyval-wrap" action="/alarm/{{.AlarmID}}/cancel" method="POST">
+			<button class="cancel keyval">
+				{{template "icon.stop-circle"}} Cancel / Stop
+			</button>
+		</form>
+		{{end}}
 	</div>
+	{{if not .IsCancelled}}
+	<div>
+		<form class="body" action="/alarm/{}/edit" method="POST">
+			<button class="quicksubtract keyval">
+				{{template "icon.minus-circle"}} -60 min
+			</button>
+			<button class="quicksubtract keyval">
+				{{template "icon.minus-circle"}} -45 min
+			</button>
+			<button class="quicksubtract keyval">
+				{{template "icon.minus-circle"}} -30 min
+			</button>
+			<button class="quicksubtract keyval">
+				{{template "icon.minus-circle"}} -15 min
+			</button>
+
+			<button class="quickadd keyval">
+				{{template "icon.plus-circle"}} +15 min
+			</button>
+			<button class="quickadd keyval">
+				{{template "icon.plus-circle"}} +30 min
+			</button>
+			<button class="quickadd keyval">
+				{{template "icon.plus-circle"}} +45 min
+			</button>
+			<button class="quickadd keyval">
+				{{template "icon.plus-circle"}} +60 min
+			</button>
+
+			<button class="keyval">
+				{{template "icon.pencil"}} Edit Alarm
+			</button>
+
+
+		</form>
+	</div>
+	{{end}}
 </div>
 {{end}}

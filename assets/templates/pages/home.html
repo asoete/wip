@@ -2,7 +2,7 @@
 
 <div class="hero">
 	<image src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
-	<h1>Work in Peace</h1>
+	<h1><i>Work in Peace</i></h1>
 </div>
 
 <nav class="nav sm-dp-none">
@@ -26,6 +26,49 @@
 
 {{define "page.main"}}
 
+<h2>Start New Alarm</h2>
+
+<form class="alarm-card new-alarm" action="/alarm" method="POST">
+	<div class="body">
+		<div class="keyval">
+			<label>{{template "icon.bell-alert"}} Deadline</label>
+			<input
+				required
+				type="datetime-local"
+				name="deadline"
+				value="{{.new_alarm.proposed_datetime}}"
+			>
+			<div class="input-help">Start sending alerts past this time</div>
+		</div>
+
+		<div class="keyval description">
+			<label>{{template "icon.information-circle"}} Description</label>
+			<input
+				required
+				type="text"
+				name="description"
+				value="{{.proposed_description}}"
+				placeholder=""
+			>
+			<div class="input-help">Description of what you're about to do</div>
+		</div>
+
+		<div class="keyval">
+			<label>{{template "icon.queue-list"}} Alert Channel</label>
+			<select name="channel" required>
+				<option>Lab Lambrecht</option>
+			</select>
+			<div class="input-help">Send alerts in this NTFY channel</div>
+		</div>
+
+		<div class="keyval">
+			<button type="submit" value="start" name="countdown">
+				{{template "icon.play-circle"}}
+				Start Countdown
+			</button>
+		</div>
+	</div>
+</form>
 
 <h2>Active Alarms</h2>
 {{range $a := .alarms.active}}

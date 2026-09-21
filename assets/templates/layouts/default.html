@@ -7,6 +7,13 @@
 			{{block "page.title" . }} WiP | Work in Peace ⏰ {{end}}
 		</title>
 		<style>
+		@font-face {
+			font-family: Excalifont;
+			src: url(/fonts/Excalifont-Regular.woff2);
+		}
+		* {
+			box-sizing: border-box;
+		}
 		body {
 			padding: 0;
 			margin:0;
@@ -25,19 +32,21 @@
 				display: flex;
 				img {
 					height: 2em;
+					filter: grayscale(0.3);
 				}
 
 				h1 {
 					margin: 0 0.5em;
-					font-family: monospace;
+					font-family: Excalifont;
 					font-size: 1.75em;
 					font-size: 2em;
-					word-spacing: -0.3em;
+					color: #777;
 				}
 			}
 
 			nav {
 
+				font-family: Excalifont;
 				ul {
 					padding: 0;
 					margin: 0;
@@ -52,6 +61,7 @@
 				padding: 0 1em;
 				display: inline-block;
 				text-align: right;
+				font-family: Excalifont;
 			}
 		}
 
@@ -62,19 +72,19 @@
 
 		h2 {
 			margin: 0.5em;
-			margin-top: 1em;
+			margin-top: 1.5em;
 			border-bottom: solid #ddd 1px;
-			color: rgba(0,0,0,0.7);
+			color: rgba(0,0,0,0.3);
 			font-size: 1.3em;
+			font-family: Excalifont;
 		}
 		.value-na {
 			font-weight: bold;
 			font-style: italic;
 			color: rgba(1,0,0,0.1);
 			padding: 0.25em 1em;
-			margin-top: 0.25em;
-			margin-bottom: -0.25em;
 			text-align: center;
+			font-family: Excalifont;
 		}
 		.alarm-card {
 			background: white;
@@ -89,7 +99,7 @@
 				background: #f8f8f8;
 				margin: -0.5em;
 				margin-bottom: 0.5em;
-					padding: 0.25em 0.5em;
+				padding: 0.25em 0.5em;
 				border-top-left-radius: 5px;
 				border-top-right-radius: 5px;
 
@@ -105,7 +115,7 @@
 				.description {
 					font-weight: 500;;
 					font-style: italic;
-					color: #666
+					color: #666;
 				}
 			}
 			.body {
@@ -128,19 +138,117 @@
 					font-weight: bold;
 					color: rgba(0,0,0,0.5);
 					/* text-decoration: underline; */
-					margin-bottom: -0.5em;
+					/* margin-bottom: -0.5em; */
 
-					svg {
-						height: 1em;
-						margin-bottom: -1px;;
-					}
 				}
 
-				label + * {
+				label + time {
 					font-family: monospace;
 					word-spacing: -0.3em;
 				}
+
+				.input-help {
+					font-size: 0.6em;
+					color: rgba(0,0,0,0.5);
+					font-style: italic;
+				}
 			}
+			.cancel-keyval-wrap {
+				padding: 0.25em;
+				margin: 0;
+			}
+			.keyval.cancel {
+				margin:0;
+				background-color:  rgba(255,0,0,0.05);
+				border: solid rgba(255,0,0,0.2) 1px;
+				font-family: Excalifont;
+				vertical-align: center;
+				width: 100%;
+				height: 100%;
+			}
+			.keyval.cancel:hover {
+				background-color:  rgba(255,0,0,0.1);
+				border: solid rgba(255,0,0,0.3) 1px;
+				cursor: pointer;
+			}
+			.keyval.quickadd {
+				background-color:  rgba(0,255,0,0.05);
+				border: solid rgba(0,255,0,0.2) 1px;
+				font-family: Excalifont;
+				vertical-align: center;
+			}
+			.keyval.quickadd:hover {
+				background-color:  rgba(0,255,0,0.1);
+				border: solid rgba(0,255,0,0.3) 1px;
+				cursor: pointer;
+			}
+			.keyval.quicksubtract {
+				background-color:  rgba(0,0,255,0.05);
+				border: solid rgba(0,0,255,0.2) 1px;
+				font-family: Excalifont;
+				vertical-align: center;
+			}
+			.keyval.quicksubtract:hover {
+				background-color:  rgba(0,0,255,0.1);
+				border: solid rgba(0,0,255,0.3) 1px;
+				cursor: pointer;
+			}
+		}
+
+		.alarm-card.overdue {
+			border: solid rgba(255,0,0,0.2) 1px;
+				.head{
+					background-color: rgba(255,0,0,0.1);
+
+						.description {
+							color: darkred;
+						}
+				}
+		}
+
+		.alarm-card.new-alarm {
+
+			.body{
+				gap: 1em;
+			}
+
+			.keyval {
+				flex: 0 0 auto;
+				align-content: center;
+				border: none;
+			}
+
+			.keyval.description {
+				flex: 1 0 auto;
+			}
+
+			input, select, button {
+				width: 100%;
+				border: 0;
+				background-color: rgba(0,0,255,0.05);
+				border-radius: 5px;
+				padding: 0.5em;
+				margin: 2px 0;
+			}
+
+			button {
+				/* padding: 1em 0.5em; */
+				background-color: rgba(0,255,0,0.05);
+				border: solid rgba(0,255,0,0.2) 1px;
+				font-family: Excalifont;
+			}
+
+			button:hover {
+				background-color: rgba(0,255,0,0.1);
+				border: solid rgba(0,255,0,0.3) 1px;
+				cursor: pointer;
+			}
+		}
+
+		svg {
+			display: inline-block;
+			height: 1em;
+			vertical-align: center;
 		}
 		@media screen and (max-width: 576px) {
 			/*
