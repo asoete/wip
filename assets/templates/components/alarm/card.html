@@ -20,6 +20,9 @@
 			<time datetime="{{.Deadline}}">
 				<span>{{.DeadlineTime.Format "Mon Jan _2"}}</span>
 				<b>{{.DeadlineTime.Format "15:04"}}</b>
+				{{/* <code style="font-size: 0.7em;" title="Time Till Deadline">
+				({{.TTL.Round 1_000_000_000}})
+				</code> */}}
 			</time>
 		</div>
 
