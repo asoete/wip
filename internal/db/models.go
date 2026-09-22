@@ -6,14 +6,16 @@ package db
 
 import (
 	"database/sql"
+
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
 )
 
 type Alarm struct {
 	AlarmID     int64
 	User        string
-	CreatedAt   string
-	Deadline    string
-	CancelledAt sql.NullString
+	CreatedAt   sqlite.Time
+	Deadline    sqlite.Time
+	CancelledAt sqlite.NullTime
 	Description sql.NullString
 }
 

@@ -7,3 +7,16 @@ sql:
     go:
       package: "db"
       out: "internal/db"
+      overrides:
+        - column: "alarms.created_at"
+          go_type:
+            import: "vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
+            type: "Time"
+        - column: "alarms.deadline"
+          go_type:
+            import: "vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
+            type: "Time"
+        - column: "alarms.cancelled_at"
+          go_type:
+            import: "vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
+            type: "NullTime"
