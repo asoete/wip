@@ -8,6 +8,8 @@ package db
 import (
 	"context"
 	"database/sql"
+
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
 )
 
 const cancelAlarm = `-- name: CancelAlarm :one
@@ -198,6 +200,31 @@ SELECT alarm_id, user, created_at, deadline, cancelled_at, description FROM alar
 
 func (q *Queries) SelectAlarm(ctx context.Context, alarmID int64) (Alarm, error) {
 	row := q.db.QueryRowContext(ctx, selectAlarm, alarmID)
+	var i Alarm
+	err := row.Scan(
+		&i.AlarmID,
+		&i.User,
+		&i.CreatedAt,
+		&i.Deadline,
+		&i.CancelledAt,
+		&i.Description,
+	)
+	return i, err
+}
+
+const updateAlarmDeadline = `-- name: UpdateAlarmDeadline :one
+UPDATE alarms SET deadline = ?
+WHERE alarm_id = ?
+RETURNING alarm_id, user, created_at, deadline, cancelled_at, description
+`
+
+type UpdateAlarmDeadlineParams struct {
+	Deadline sqlite.Time
+	AlarmID  int64
+}
+
+func (q *Queries) UpdateAlarmDeadline(ctx context.Context, arg UpdateAlarmDeadlineParams) (Alarm, error) {
+	row := q.db.QueryRowContext(ctx, updateAlarmDeadline, arg.Deadline, arg.AlarmID)
 	var i Alarm
 	err := row.Scan(
 		&i.AlarmID,

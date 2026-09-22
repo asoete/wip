@@ -22,3 +22,8 @@ RETURNING *;
 UPDATE alarms SET cancelled_at = DATETIME('now')
 WHERE alarm_id = ?
 RETURNING *;
+
+-- name: UpdateAlarmDeadline :one
+UPDATE alarms SET deadline = ?
+WHERE alarm_id = ?
+RETURNING *;

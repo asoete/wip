@@ -61,36 +61,38 @@
 	</div>
 	{{if not .IsCancelled}}
 	<div>
-		<form class="body" action="/alarm/{}/edit" method="POST">
-			<button class="quicksubtract keyval">
+		<form class="body" action="/alarm/{{.AlarmID}}/quickadd" method="POST">
+			<button class="quicksubtract keyval" name="quickadd" value="-60m">
 				{{template "icon.minus-circle"}} -60 min
 			</button>
-			<button class="quicksubtract keyval">
+			<button class="quicksubtract keyval" name="quickadd" value="-45m">
 				{{template "icon.minus-circle"}} -45 min
 			</button>
-			<button class="quicksubtract keyval">
+			<button class="quicksubtract keyval" name="quickadd" value="-30m">
 				{{template "icon.minus-circle"}} -30 min
 			</button>
-			<button class="quicksubtract keyval">
+			<button class="quicksubtract keyval" name="quickadd" value="-15m">
 				{{template "icon.minus-circle"}} -15 min
 			</button>
 
-			<button class="quickadd keyval">
+			<button class="quickadd keyval" name="quickadd" value="15m">
 				{{template "icon.plus-circle"}} +15 min
 			</button>
-			<button class="quickadd keyval">
+			<button class="quickadd keyval" name="quickadd" value="30m">
 				{{template "icon.plus-circle"}} +30 min
 			</button>
-			<button class="quickadd keyval">
+			<button class="quickadd keyval" name="quickadd" value="45m">
 				{{template "icon.plus-circle"}} +45 min
 			</button>
-			<button class="quickadd keyval">
+			<button class="quickadd keyval" name="quickadd" value="60m">
 				{{template "icon.plus-circle"}} +60 min
 			</button>
 
+			{{/*
 			<button class="keyval">
 				{{template "icon.pencil"}} Edit Alarm
 			</button>
+			*/}}
 
 
 		</form>
