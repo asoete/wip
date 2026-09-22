@@ -1,5 +1,6 @@
 {{define "component.alarm.card"}}
-<div class="alarm-card {{if .Overdue}}overdue{{end}}">
+{{/* 1800000000000 == 30min */}}
+<div class="alarm-card {{if .Overdue}}overdue{{end}} {{if and (not .IsCancelled) (not .Overdue) (lt .TTL 1800000000000)  }}nearing-deadline{{end}}">
 	<div class="head">
 		<div class="id">
 		#{{.AlarmID}}
