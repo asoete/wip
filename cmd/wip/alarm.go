@@ -9,16 +9,14 @@ import (
 	"strconv"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
 func init() {
 	http.HandleFunc("POST /alarm", alarmCreateHandler)
-	http.HandleFunc("POST /alarm/{id}/cancel", alarmCancelHandler)
 }
-
-// ---------------------------------------------------------------------------
 
 func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -60,11 +58,20 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // ---------------------------------------------------------------------------
 
+func init() {
+	http.HandleFunc("POST /alarm/{id}/cancel", alarmCancelHandler)
+}
+
 func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: handle errors graceful
 	// TODO: Input validation
 	// TODO: AuthZ: may this user cancel the alarm??
+
+	// user, err := user.FromRequest(r)
+	// if err != nil {
+	// 	log.Fatalf("unable to obtain user: %v", err)
+	// }
 
 	alarm_id_str := r.PathValue("id")
 	alarm_id, err := strconv.ParseInt(alarm_id_str, 10, 64)
