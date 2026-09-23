@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"flag"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -14,28 +12,19 @@ import (
 
 	_ "modernc.org/sqlite"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/config"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 )
 
-// flags
-var listenAddress string
-var listenPort int
-
-var dbDSN string
-
-var ctlAddress string
 var ctlMux = http.NewServeMux()
-
-var tokenMuxTokenHeader = "X-WiP-Ctl-Token"
-var tokenMuxToken = "wip-ctl-token-please-change!"
-
-var dumpConfig = false
-var pidfile string
+var tokenMuxToken string
 
 // database handles
 var dbRO *db.Queries
 var dbRW *db.Queries
+
+var APP config.Application
 
 // types
 type tokenMux struct {
@@ -44,34 +33,25 @@ type tokenMux struct {
 
 func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	recToken := r.Header.Get(tokenMuxTokenHeader)
+	recToken := r.Header.Get(APP.Ctl.AuthHeader)
 	if recToken == tokenMuxToken {
 		m.handler.ServeHTTP(w, r)
 		return
 	}
 
 	abort.Fatal(w, http.StatusUnauthorized, "invalid auth token",
-		tokenMuxTokenHeader, recToken,
+		APP.Ctl.AuthHeader, recToken,
 		"middleware", "tokenMux",
 	)
 }
 
 func init() {
-	// Web service
-	flag.StringVar(&listenAddress, "web.address", "127.0.0.1:8080", "bind to this `address`")
-
-	// Database
-	flag.StringVar(&dbDSN, "db.dsn", "sqlite::memory:", "connect to this `dsn`")
-
-	// Control service
-	flag.StringVar(&ctlAddress, "ctl.address", "127.0.0.1:8100", "bind service control to this `address`")
-
-	// Misc options
-	flag.BoolVar(&dumpConfig, "dump-config", false, "dump the active config and exit")
-	flag.StringVar(&pidfile, "pidfile", "", "write the WiP service pid to this `path`")
+	APP.Init()
 }
 
 func main() {
+
+	APP.Boot()
 
 	currentLogLevel := slog.SetLogLoggerLevel(slog.LevelDebug)
 	defer slog.SetLogLoggerLevel(currentLogLevel) // revert changes after the example
@@ -81,54 +61,35 @@ func main() {
 		tokenMuxToken = os.Getenv("WIP_CTL_TOKEN")
 	}
 
-	// Handle command line parameters
-	flag.Parse()
+	if APP.DumpConfig || slog.Default().Handler().Enabled(context.Background(), slog.LevelDebug) {
 
-	if dumpConfig || slog.Default().Handler().Enabled(context.Background(), slog.LevelDebug) {
+		APP.Dump()
 
-		if !dumpConfig {
-			fmt.Printf("== DEBUG: dump config =====================================\n")
-		}
-
-		fmt.Printf("    --web.address = %s\n", listenAddress)
-		fmt.Printf("        --pidfile = %s\n", pidfile)
-
-		fmt.Printf("         --db.dsn = %s\n", dbDSN)
-
-		fmt.Printf("    --ctl.address = %s\n", ctlAddress)
-		fmt.Printf("  X-WiP-Ctl-Token = %s\n", tokenMuxToken)
-
-		if !dumpConfig {
-			fmt.Printf("===========================================================\n")
-		}
-
-		if dumpConfig {
+		if APP.DumpConfig {
 			os.Exit(0)
 		}
 	}
 
-	if pidfile != "" {
-
-		slog.Info("detected --pidfile: write pidfile", "path", pidfile)
+	if APP.Pidfile != "" {
 
 		// TODO: add plumbing to handle os.Exit, interupts and sigterms from other workers
-		defer os.Remove(pidfile)
+		defer os.Remove(APP.Pidfile)
 
-		err := os.MkdirAll(filepath.Dir(pidfile), os.ModePerm)
+		err := os.MkdirAll(filepath.Dir(APP.Pidfile), os.ModePerm)
 		if err != nil {
 			log.Fatal("create pidfile (parent) dir failed:", err)
 		}
 
-		err = os.WriteFile(pidfile, []byte(strconv.Itoa(os.Getpid())), 0644)
+		err = os.WriteFile(APP.Pidfile, []byte(strconv.Itoa(os.Getpid())), 0644)
 		if err != nil {
 			log.Fatal("create pidfile failed:", err)
 		}
 	}
 
 	// init database handles
-	dbhandle, err := sql.Open("sqlite", dbDSN)
+	dbhandle, err := sql.Open("sqlite", APP.Db.Dsn)
 	if err != nil {
-		log.Fatalf("unable to parse database(%s): %w", dbDSN, err)
+		log.Fatalf("unable to parse database(%s): %w", APP.Db.Dsn, err)
 	}
 
 	dbRW = db.New(dbhandle)
@@ -137,12 +98,12 @@ func main() {
 
 	// Start (separate) server to listen for control commands
 	go func() {
-		slog.Info("[CTL] start control service", "--ctl.address", ctlAddress)
+		slog.Info("[CTL] start control service", "--ctl.address", APP.Ctl.Address)
 		slog.Debug("[CTL]", "X-WiP-Ctl-Token", tokenMuxToken)
-		log.Fatal(http.ListenAndServe(ctlAddress, &tokenMux{ctlMux}))
+		log.Fatal(http.ListenAndServe(APP.Ctl.Address, &tokenMux{ctlMux}))
 	}()
 
 	// Start main webserver
-	slog.Info("[WEB] start web service", "--web.address", listenAddress)
-	log.Fatal(http.ListenAndServe(listenAddress, nil))
+	slog.Info("[WEB] start web service", "--web.address", APP.Web.Address)
+	log.Fatal(http.ListenAndServe(APP.Web.Address, nil))
 }
