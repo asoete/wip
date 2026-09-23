@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	_ "modernc.org/sqlite"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 )
@@ -49,7 +50,10 @@ func (m *tokenMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	abort(w, http.StatusUnauthorized, "invalid token (host=%s ; path=%s ; user=%s)", r.URL.Host, r.URL.Path, r.URL.User)
+	abort.Fatal(w, http.StatusUnauthorized, "invalid auth token",
+		tokenMuxTokenHeader, recToken,
+		"middleware", "tokenMux",
+	)
 }
 
 func init() {
