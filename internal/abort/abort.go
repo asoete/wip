@@ -114,3 +114,12 @@ func (a *Aborter) AuthError(w http.ResponseWriter, err error, args ...any) {
 
 	a.Fatal(w, http.StatusForbidden, args...)
 }
+
+// ---------------------------------------------------------------------------
+
+func (a *Aborter) InputError(w http.ResponseWriter, err error, args ...any) {
+
+	args = append(args, "error", err)
+
+	a.Fatal(w, http.StatusBadRequest, args...)
+}
