@@ -27,6 +27,7 @@ WIP.PIDFILE := /dev/shm/wip/wip.pid
 DB.SQLITE_FILE := data/work-in-peace.sqlite
 DB.DSN := file:$(DB.SQLITE_FILE)
 PRX.ADDRESS := 127.0.0.1:8888
+NTFY.SERVER_URL := https://msg.irc.ugent.be:1443
 
 # -- CONTROL Config
 

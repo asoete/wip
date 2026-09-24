@@ -17,6 +17,7 @@ type Application struct {
 	Web        WebConfig
 	Ctl        CtlConfig
 	Db         DbConfig
+	Ntfy       NtfyConfig
 }
 
 // ----------------------------------------------------------------------------
@@ -29,6 +30,7 @@ func (a *Application) Init() {
 	a.Web.Init()
 	a.Ctl.Init()
 	a.Db.Init()
+	a.Ntfy.Init()
 }
 
 func (a *Application) Boot() {
@@ -38,6 +40,7 @@ func (a *Application) Boot() {
 	Web = &a.Web // Hacky as heck
 	a.Ctl.Boot()
 	a.Db.Boot()
+	a.Ntfy.Boot()
 }
 
 func (a *Application) Dump() {
@@ -108,3 +111,30 @@ func (dc *DbConfig) Init() {
 // ----------------------------------------------------------------------------
 
 func (dc *DbConfig) Boot() {}
+
+// ============================================================================
+
+type NtfyConfig struct {
+	ServerUrlStr string
+	serverUrl    *url.URL
+}
+
+// ----------------------------------------------------------------------------
+
+func (nc *NtfyConfig) Init() {
+	flag.StringVar(&nc.ServerUrlStr, "ntfy.server-url", "https://ntfy.sh", "NTFY.sh server `url`")
+}
+
+// ----------------------------------------------------------------------------
+
+func (nc *NtfyConfig) Boot() {
+
+	url, err := url.Parse(nc.ServerUrlStr)
+
+	if err != nil {
+		log.Fatalf("config.Ntfy.Boot() failed: unable to parse url --ntfy.server-url='%s' : %s", nc.ServerUrlStr, err)
+	}
+
+	nc.serverUrl = url
+}
+

@@ -12,6 +12,7 @@ run: fmt db.sql
 			--web.address $(WIP.ADDRESS) \
 			--pidfile $(WIP.PIDFILE) \
 			--db.dsn $(DB.DSN) \
+			--ntfy.server-url $(NTFY.SERVER_URL)
 
 # Call a Control endpoint with all necessary parameters and flags
 # USAGE: make post-ctl url=/ctl/migrate/fresh
