@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
@@ -30,9 +31,12 @@ func init() {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 
+	abrt := abort.New("handler", "homeHandler")
+
 	user, err := user.FromRequest(r)
 	if err != nil {
-		slog.Error("unable to retrieve user from request", "error", err)
+		abrt.AuthError(w, err)
+		return
 	}
 
 	ctx := context.Background()
