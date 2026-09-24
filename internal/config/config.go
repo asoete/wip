@@ -5,7 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 )
+
+var Web *WebConfig
 
 // APP.Web.Address()
 type Application struct {
@@ -32,6 +35,7 @@ func (a *Application) Boot() {
 	flag.Parse()
 
 	a.Web.Boot()
+	Web = &a.Web // Hacky as heck
 	a.Ctl.Boot()
 	a.Db.Boot()
 }
@@ -53,13 +57,17 @@ func (a *Application) Dump() {
 // ============================================================================
 
 type WebConfig struct {
-	Address string
-}
-
-// ----------------------------------------------------------------------------
+	Address              string
+	RemoteUserHeader     string
+	RemoteUsernameHeader string
+	RemoteGroupsHeader   string
+} // ----------------------------------------------------------------------------
 
 func (wc *WebConfig) Init() {
 	flag.StringVar(&wc.Address, "web.address", "127.0.0.1:8080", "bind to this `address`")
+	flag.StringVar(&wc.RemoteUserHeader, "web.remote-user-header", "REMOTE_USER", "this HTTP header holds the universal unique OpenIDc identifier")
+	flag.StringVar(&wc.RemoteUsernameHeader, "web.remote-username-header", "OIDC_CLAIM_preferred_username", "this HTTP header holds the preferred username")
+	flag.StringVar(&wc.RemoteGroupsHeader, "web.remote-groups-header", "OIDC_CLAIM_memberOf", "this HTTP header holds the comma separated groups list ")
 }
 
 // ----------------------------------------------------------------------------
