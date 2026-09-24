@@ -56,7 +56,9 @@
 		<div class="keyval">
 			<label>{{template "icon.queue-list"}} Alert Channel</label>
 			<select name="channel" required>
-				<option>Lab Lambrecht</option>
+				{{range $g := .user.Groups}}
+				<option value="{{$g}}">{{$g}}</option>
+				{{end}}
 			</select>
 			<div class="input-help">Send alerts in this NTFY channel</div>
 		</div>

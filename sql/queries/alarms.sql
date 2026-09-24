@@ -14,8 +14,8 @@ SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline A
 SELECT * FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL ORDER BY deadline DESC;
 
 -- name: InsertAlarm :one
-INSERT INTO alarms (user, deadline, description)
-VALUES (?, DATETIME(?, 'utc'), ?)
+INSERT INTO alarms (user, deadline, description, channel)
+VALUES (?, DATETIME(?, 'utc'), ?, ?)
 RETURNING *;
 
 -- name: CancelAlarm :one

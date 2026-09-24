@@ -1,6 +1,8 @@
 package config
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -138,3 +140,27 @@ func (nc *NtfyConfig) Boot() {
 	nc.serverUrl = url
 }
 
+// ----------------------------------------------------------------------------
+
+func (nc *NtfyConfig) SecretUrlFrom(str string) (*url.URL, error) {
+
+	hasher := sha1.New()
+	_, err := hasher.Write([]byte(str))
+	if err != nil {
+		return &url.URL{}, err
+	}
+
+	hashValue := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
+	path := fmt.Sprintf("wip-%s-%.*s", str, 5, hashValue)
+
+	return nc.UrlFrom(path), nil
+
+}
+
+// ----------------------------------------------------------------------------
+
+func (nc *NtfyConfig) UrlFrom(str string) *url.URL {
+
+	return nc.serverUrl.JoinPath(str)
+}

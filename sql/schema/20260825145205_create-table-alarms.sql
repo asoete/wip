@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS alarms (
 	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	deadline TEXT NOT NULL,
 	cancelled_at TEXT,
+	channel TEXT NOT NULL,
 	description TEXT
 );
 

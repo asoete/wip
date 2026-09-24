@@ -35,7 +35,6 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
-
 	abrt.Append("user", user)
 
 	err = r.ParseForm()
@@ -49,13 +48,43 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	deadline := r.PostForm.Get("deadline")
 	description := r.PostForm.Get("description")
+	channel_name := r.PostForm.Get("channel")
+
+	if channel_name == "" {
+		abrt.InputError(w, fmt.Errorf("channel is empty"), "invalid channel provided",
+			"channel_name", channel_name,
+		)
+		return
+	}
+
+	fmt.Printf("channel_name: %v\n", channel_name)
 
 	ctx := context.Background()
+
+	var channel db.NtfyChannel
+	channel, err = dbRW.SelectChannel(ctx, channel_name)
+
+	if err != nil && err != sql.ErrNoRows {
+		abrt.DbError(w, err, "invalid channel")
+		return
+	}
+
+	if err == sql.ErrNoRows {
+		url, err := APP.Ntfy.SecretUrlFrom(channel_name)
+		if err != nil {
+			abrt.Error(w, err, "creating channel failed", "channel", channel)
+		}
+		channel, err = dbRW.InsertChannel(ctx, db.InsertChannelParams{
+			Name: channel_name,
+			Url:  url.String(),
+		})
+	}
 
 	dbAlarm, err := dbRW.InsertAlarm(ctx, db.InsertAlarmParams{
 		User:        user.Username,
 		Datetime:    deadline,
 		Description: sql.NullString{String: description, Valid: description != ""},
+		Channel:     channel.Name,
 	})
 
 	if err != nil {

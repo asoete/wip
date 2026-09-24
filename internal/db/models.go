@@ -15,8 +15,9 @@ type Alarm struct {
 	User        string
 	CreatedAt   sqlite.Time
 	Deadline    sqlite.Time
-	CancelledAt sqlite.NullTime
 	Description sql.NullString
+	Channel     string
+	CancelledAt sqlite.NullTime
 }
 
 type Migration struct {
@@ -27,5 +28,6 @@ type Migration struct {
 
 type NtfyChannel struct {
 	ChannelID int64
+	Name      string
 	Url       string
 }
