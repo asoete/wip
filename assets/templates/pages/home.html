@@ -56,12 +56,14 @@ No Active alarms
 {{end}}
 
 <h2>My Recent History</h2>
-{{range $a := .alarms.cancelled}}
-	{{template "component.alarm.card" $a }}
-{{else}}
-<div class="value-na">
-No History
+<div class="" style="opacity: 0.8;">
+	{{range $a := .alarms.cancelled}}
+		{{template "component.alarm.card" $a }}
+	{{else}}
+	<div class="value-na">
+	No History
+	</div>
+	{{end}}
 </div>
-{{end}}
 
 {{end}}
