@@ -35,6 +35,13 @@ type Aborter struct {
 // ---------------------------------------------------------------------------
 
 func (a *Aborter) Fatal(w http.ResponseWriter, httpStatusCode int, args ...any) {
+	a.fatal(w, httpStatusCode, args...)
+}
+
+// Make fatal() private and proxy public methods to this function, this way,
+// runtime.Caller(2) always points to the correct location
+
+func (a *Aborter) fatal(w http.ResponseWriter, httpStatusCode int, args ...any) {
 
 	var userMsg string
 
@@ -52,7 +59,7 @@ func (a *Aborter) Fatal(w http.ResponseWriter, httpStatusCode int, args ...any) 
 	args = append(a.tags, args...)
 
 	// Annotate with file and line number
-	_, file, linenr, ok := runtime.Caller(1)
+	_, file, linenr, ok := runtime.Caller(2)
 	if ok {
 		pwd, err := os.Getwd()
 		if err != nil {
@@ -93,7 +100,7 @@ func (a *Aborter) DbError(w http.ResponseWriter, err error, args ...any) {
 		return
 	}
 
-	a.Fatal(w, http.StatusNotFound, args...)
+	a.fatal(w, http.StatusInternalServerError, args...)
 }
 
 // ---------------------------------------------------------------------------
@@ -103,7 +110,7 @@ func (a *Aborter) Error(w http.ResponseWriter, err error, userMsg string, args .
 	args = append([]any{userMsg}, args...)
 	args = append(args, "error", err)
 
-	a.Fatal(w, http.StatusInternalServerError, args...)
+	a.fatal(w, http.StatusInternalServerError, args...)
 }
 
 // ---------------------------------------------------------------------------
@@ -112,7 +119,7 @@ func (a *Aborter) AuthError(w http.ResponseWriter, err error, args ...any) {
 
 	args = append(args, "error", err)
 
-	a.Fatal(w, http.StatusForbidden, args...)
+	a.fatal(w, http.StatusForbidden, args...)
 }
 
 // ---------------------------------------------------------------------------
@@ -121,5 +128,5 @@ func (a *Aborter) InputError(w http.ResponseWriter, err error, args ...any) {
 
 	args = append(args, "error", err)
 
-	a.Fatal(w, http.StatusBadRequest, args...)
+	a.fatal(w, http.StatusBadRequest, args...)
 }
