@@ -40,15 +40,19 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	abrt.Append("user", user)
+
 	ctx := context.Background()
 	activeAlarms, err := dbRW.ListActiveUserAlarms(ctx, user.Username)
 	if err != nil {
-		slog.Error("unable to retrieve active user alarms", "user", user, "error", err)
+		abrt.DbError(w, err, "error retrieving active alarms")
+		return
 	}
 
 	cancelledAlarms, err := dbRW.ListCancelledUserAlarms(ctx, user.Username)
 	if err != nil {
-		slog.Error("unable to retrieve cancelled user alarms", "user", user, "error", err)
+		abrt.DbError(w, err, "error retrieving history")
+		return
 	}
 
 	// log.Printf("user: %+v\n", user)
