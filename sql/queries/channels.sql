@@ -5,3 +5,6 @@ RETURNING *;
 
 -- name: SelectChannel :one
 SELECT * FROM ntfy_channels WHERE name = ?;
+
+-- name: ListChannels :many
+SELECT * FROM ntfy_channels;

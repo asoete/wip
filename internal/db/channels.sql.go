@@ -27,6 +27,33 @@ func (q *Queries) InsertChannel(ctx context.Context, arg InsertChannelParams) (N
 	return i, err
 }
 
+const listChannels = `-- name: ListChannels :many
+SELECT channel_id, name, url FROM ntfy_channels
+`
+
+func (q *Queries) ListChannels(ctx context.Context) ([]NtfyChannel, error) {
+	rows, err := q.db.QueryContext(ctx, listChannels)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []NtfyChannel
+	for rows.Next() {
+		var i NtfyChannel
+		if err := rows.Scan(&i.ChannelID, &i.Name, &i.Url); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const selectChannel = `-- name: SelectChannel :one
 SELECT channel_id, name, url FROM ntfy_channels WHERE name = ?
 `

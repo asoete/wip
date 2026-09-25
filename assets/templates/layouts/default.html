@@ -260,6 +260,46 @@
 			height: 1em;
 			vertical-align: center;
 		}
+
+		dialog {
+			width: 80vw;
+			max-width: 720px;
+			border: none;
+			background: none;
+			.body {
+				display: flex;
+				flex-wrap: wrap;
+			}
+			.alarm-card .keyval {
+				border: none;
+				flex: 1 1 auto;
+			}
+			input {
+				width: 100%;
+				border: none;
+				background-color: rgba(0,0,255,0.05);
+				border-radius: 5px;
+				padding: 0.5em;
+				margin: 2px 0;
+			}
+			.body button.keyval {
+				max-width: 10em;
+				background-color: rgba(0,255,0,0.05);
+				border: solid rgba(0,255,0,0.2) 1px;
+				font-family: Excalifont;
+				cursor: pointer;
+			}
+			.body button.keyval:hover {
+				background-color: rgba(0,255,0,0.1);
+				border: solid rgba(0,255,0,0.3) 1px;
+				cursor: pointer;
+			}
+		}
+		::backdrop {
+			background-color: #aaa;
+			opacity: 0.75;
+		}
+
 		@media screen and (max-width: 576px) {
 			/*
 			body {
@@ -275,6 +315,13 @@
 				visibility: hidden;
 				width: 0px;
 				height: 0px;
+				position: absolute;
+			}
+			dialog .body .keyval.keyval {
+				flex: 1 1 100% ;
+			}
+			dialog .body button.keyval {
+				max-width: none;
 			}
 		}
 		/*

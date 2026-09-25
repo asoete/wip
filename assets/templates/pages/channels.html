@@ -1,0 +1,45 @@
+{{define "page.main"}}
+
+{{range $c := .channels}}
+<div class="alarm-card">
+	<div class="body">
+		<div class="keyval"  style="flex: 1 1 10%">
+			<label>ChannelID</label>
+			<div style="font-family: monospace;">{{.ChannelID}}</div>
+		</div>
+		<div class="keyval"  style="flex: 1 1 10%">
+			<label>Name</label>
+			<div style="font-family: monospace;">{{.Name}}</div>
+		</div>
+		<div class="keyval"  style="flex: 1 1 50%">
+			<label>URL</label>
+			<a style="font-family: monospace;" href="{{.Url}}">{{.Url}}</a>
+		</div>
+	</div>
+</div>
+{{end}}
+
+<div style="padding: 0.5em; text-align: right;">
+	<button popovertarget="add-channel-dialog">
+		{{template "icon.plus-circle"}}
+		Add Channel
+	</button>
+</div>
+
+<dialog id="add-channel-dialog" popover>
+	<form action="/channels" method="POST" class="alarm-card">
+		<div class="body">
+			<div class="keyval">
+				<label>Channel Name</label>
+				<input type="text" name="channel_name">
+			</div>
+
+			<button class="keyval">
+				{{template "icon.plus-circle"}} Submit
+			</button>
+		</div>
+	</form>
+</dialog>
+
+
+{{end}}
