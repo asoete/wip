@@ -15,7 +15,7 @@ import (
 const cancelAlarm = `-- name: CancelAlarm :one
 UPDATE alarms SET cancelled_at = DATETIME('now')
 WHERE alarm_id = ?
-RETURNING alarm_id, user, created_at, deadline, description, channel, cancelled_at
+RETURNING alarm_id, user, created_at, deadline, cancelled_at, channel, description
 `
 
 func (q *Queries) CancelAlarm(ctx context.Context, alarmID int64) (Alarm, error) {
@@ -26,9 +26,9 @@ func (q *Queries) CancelAlarm(ctx context.Context, alarmID int64) (Alarm, error)
 		&i.User,
 		&i.CreatedAt,
 		&i.Deadline,
-		&i.Description,
-		&i.Channel,
 		&i.CancelledAt,
+		&i.Channel,
+		&i.Description,
 	)
 	return i, err
 }
@@ -36,7 +36,7 @@ func (q *Queries) CancelAlarm(ctx context.Context, alarmID int64) (Alarm, error)
 const insertAlarm = `-- name: InsertAlarm :one
 INSERT INTO alarms (user, deadline, description, channel)
 VALUES (?, DATETIME(?, 'utc'), ?, ?)
-RETURNING alarm_id, user, created_at, deadline, description, channel, cancelled_at
+RETURNING alarm_id, user, created_at, deadline, cancelled_at, channel, description
 `
 
 type InsertAlarmParams struct {
@@ -59,15 +59,15 @@ func (q *Queries) InsertAlarm(ctx context.Context, arg InsertAlarmParams) (Alarm
 		&i.User,
 		&i.CreatedAt,
 		&i.Deadline,
-		&i.Description,
-		&i.Channel,
 		&i.CancelledAt,
+		&i.Channel,
+		&i.Description,
 	)
 	return i, err
 }
 
 const listActiveAlarms = `-- name: ListActiveAlarms :many
-SELECT alarm_id, user, created_at, deadline, description, channel, cancelled_at FROM alarms WHERE cancelled_at IS NULL
+SELECT alarm_id, user, created_at, deadline, cancelled_at, channel, description FROM alarms WHERE cancelled_at IS NULL
 `
 
 func (q *Queries) ListActiveAlarms(ctx context.Context) ([]Alarm, error) {
@@ -84,9 +84,9 @@ func (q *Queries) ListActiveAlarms(ctx context.Context) ([]Alarm, error) {
 			&i.User,
 			&i.CreatedAt,
 			&i.Deadline,
-			&i.Description,
-			&i.Channel,
 			&i.CancelledAt,
+			&i.Channel,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func (q *Queries) ListActiveAlarms(ctx context.Context) ([]Alarm, error) {
 }
 
 const listActiveUserAlarms = `-- name: ListActiveUserAlarms :many
-SELECT alarm_id, user, created_at, deadline, description, channel, cancelled_at FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC
+SELECT alarm_id, user, created_at, deadline, cancelled_at, channel, description FROM alarms WHERE user = ? AND cancelled_at IS NULL ORDER BY deadline ASC
 `
 
 func (q *Queries) ListActiveUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
@@ -119,9 +119,9 @@ func (q *Queries) ListActiveUserAlarms(ctx context.Context, user string) ([]Alar
 			&i.User,
 			&i.CreatedAt,
 			&i.Deadline,
-			&i.Description,
-			&i.Channel,
 			&i.CancelledAt,
+			&i.Channel,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -137,7 +137,7 @@ func (q *Queries) ListActiveUserAlarms(ctx context.Context, user string) ([]Alar
 }
 
 const listCancelledUserAlarms = `-- name: ListCancelledUserAlarms :many
-SELECT alarm_id, user, created_at, deadline, description, channel, cancelled_at FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL ORDER BY deadline DESC
+SELECT alarm_id, user, created_at, deadline, cancelled_at, channel, description FROM alarms WHERE user = ? AND cancelled_at IS NOT NULL ORDER BY deadline DESC
 `
 
 func (q *Queries) ListCancelledUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
@@ -154,9 +154,9 @@ func (q *Queries) ListCancelledUserAlarms(ctx context.Context, user string) ([]A
 			&i.User,
 			&i.CreatedAt,
 			&i.Deadline,
-			&i.Description,
-			&i.Channel,
 			&i.CancelledAt,
+			&i.Channel,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -172,7 +172,7 @@ func (q *Queries) ListCancelledUserAlarms(ctx context.Context, user string) ([]A
 }
 
 const listUserAlarms = `-- name: ListUserAlarms :many
-SELECT alarm_id, user, created_at, deadline, description, channel, cancelled_at FROM alarms WHERE user = ?
+SELECT alarm_id, user, created_at, deadline, cancelled_at, channel, description FROM alarms WHERE user = ?
 `
 
 func (q *Queries) ListUserAlarms(ctx context.Context, user string) ([]Alarm, error) {
@@ -189,9 +189,9 @@ func (q *Queries) ListUserAlarms(ctx context.Context, user string) ([]Alarm, err
 			&i.User,
 			&i.CreatedAt,
 			&i.Deadline,
-			&i.Description,
-			&i.Channel,
 			&i.CancelledAt,
+			&i.Channel,
+			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -207,7 +207,7 @@ func (q *Queries) ListUserAlarms(ctx context.Context, user string) ([]Alarm, err
 }
 
 const selectAlarm = `-- name: SelectAlarm :one
-SELECT alarm_id, user, created_at, deadline, description, channel, cancelled_at FROM alarms WHERE alarm_id = ?
+SELECT alarm_id, user, created_at, deadline, cancelled_at, channel, description FROM alarms WHERE alarm_id = ?
 `
 
 func (q *Queries) SelectAlarm(ctx context.Context, alarmID int64) (Alarm, error) {
@@ -218,9 +218,9 @@ func (q *Queries) SelectAlarm(ctx context.Context, alarmID int64) (Alarm, error)
 		&i.User,
 		&i.CreatedAt,
 		&i.Deadline,
-		&i.Description,
-		&i.Channel,
 		&i.CancelledAt,
+		&i.Channel,
+		&i.Description,
 	)
 	return i, err
 }
@@ -228,7 +228,7 @@ func (q *Queries) SelectAlarm(ctx context.Context, alarmID int64) (Alarm, error)
 const updateAlarmDeadline = `-- name: UpdateAlarmDeadline :one
 UPDATE alarms SET deadline = ?
 WHERE alarm_id = ?
-RETURNING alarm_id, user, created_at, deadline, description, channel, cancelled_at
+RETURNING alarm_id, user, created_at, deadline, cancelled_at, channel, description
 `
 
 type UpdateAlarmDeadlineParams struct {
@@ -244,9 +244,9 @@ func (q *Queries) UpdateAlarmDeadline(ctx context.Context, arg UpdateAlarmDeadli
 		&i.User,
 		&i.CreatedAt,
 		&i.Deadline,
-		&i.Description,
-		&i.Channel,
 		&i.CancelledAt,
+		&i.Channel,
+		&i.Description,
 	)
 	return i, err
 }
