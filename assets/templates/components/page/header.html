@@ -1,0 +1,27 @@
+{{define "page.header"}}
+
+<div class="hero">
+	<image src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+	<h1><i>Work in Peace</i></h1>
+</div>
+
+<nav class="nav sm-dp-none">
+	<ul>
+		<li>
+			<a href="/">Home</a>
+		</li>
+		<li>
+			<a href="/channels">Channels</a>
+		</li>
+		<li>
+			<a href="/eventlog">Eventlog</a>
+		</li>
+	</ul>
+</nav>
+
+<div class="userinfo sm-dp-none">
+	{{.user.Username}}
+</div>
+{{end}}
+
+

@@ -25,6 +25,7 @@ func init() {
 		"assets/templates/layouts/default.html",
 		"assets/templates/pages/home.html",
 		"assets/templates/components/alarm/card.html",
+		"assets/templates/components/page/header.html",
 		"assets/templates/icons.html",
 	))
 }
