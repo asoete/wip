@@ -95,7 +95,11 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 	//slog.Info("insert new timer", "result", res, "request", r)
 	slog.Info("DB: new alarm inserted", "db.Alarm", dbAlarm)
 
-	dispatch.Register(dbAlarm)
+	err = dispatch.Register(dbAlarm)
+	if err != nil {
+		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Register() failed")
+		return
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

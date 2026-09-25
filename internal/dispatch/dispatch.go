@@ -12,6 +12,8 @@ import (
 )
 
 type Dispatcher struct {
+	dbRO   *db.Queries
+	dbRW   *db.Queries
 	alarms map[int64]*db.Alarm
 	timers map[int64]*time.Timer
 }
@@ -25,8 +27,12 @@ var defaultDispatcher Dispatcher = Dispatcher{
 // FACADES
 // ---------------------------------------------------------------------------
 
-func Resume(dbqs *db.Queries) error {
-	return defaultDispatcher.Resume(dbqs)
+func Boot(rw *db.Queries) error {
+	return defaultDispatcher.Boot(rw)
+}
+
+func Resume() error {
+	return defaultDispatcher.Resume()
 }
 
 func Register(a db.Alarm) error {
@@ -61,17 +67,29 @@ func GetTimers() map[int64]*time.Timer {
 // IMPLEMENTATION
 // ---------------------------------------------------------------------------
 
-func (d *Dispatcher) Resume(dbqs *db.Queries) error {
+func (d *Dispatcher) Boot(rwh *db.Queries) error {
+
+	d.dbRO = rwh
+	d.dbRW = rwh
+	return d.Resume()
+}
+
+// ---------------------------------------------------------------------------
+
+func (d *Dispatcher) Resume() error {
 
 	ctx := context.Background()
-	list, err := dbqs.ListActiveAlarms(ctx)
+	list, err := d.dbRO.ListActiveAlarms(ctx)
 	if err != nil {
 		slog.Error("unable to boot dispatch: loading active alarms failed", "error", err)
 		os.Exit(2)
 	}
 
 	for _, a := range list {
-		d.Register(a)
+		err = d.Register(a)
+		if err != nil {
+			return fmt.Errorf("dispatch.Resume(): unable to register alarm(%d): %w", a.AlarmID, err)
+		}
 	}
 
 	return nil
@@ -85,8 +103,15 @@ func (d *Dispatcher) Register(a db.Alarm) error {
 
 	d.alarms[a.AlarmID] = &a
 
+	ctx := context.Background()
+	channel, err := d.dbRO.SelectChannel(ctx, a.Channel)
+
+	if err != nil {
+		return fmt.Errorf("unable to select channel(%s): %w", a.Channel, err)
+	}
+
 	overdueAlert, err := alert.New(alert.Options{
-		Channel: "WiP-devchannel-PxLeA",
+		Channel: channel,
 		Title:   fmt.Sprintf("[WiP] %s has missed check-out", a.User),
 		Body: fmt.Sprintf(
 			"**`%s`** has set an alarm to fire at *`<%s>`* with description:\n",

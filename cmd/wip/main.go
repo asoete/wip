@@ -94,7 +94,7 @@ func main() {
 
 	dbRW = db.New(dbhandle)
 
-	dispatch.Resume(dbRW)
+	dispatch.Boot(dbRW)
 
 	// Start (separate) server to listen for control commands
 	go func() {

@@ -3,10 +3,10 @@ package alert
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
-	// "vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 )
 
 type Prio int
@@ -21,15 +21,14 @@ const (
 
 type Options struct {
 	Prio    Prio
-	Channel string
+	Channel db.NtfyChannel
 	Title   string
 	Body    string
 }
 
 type Alert struct {
 	Options
-	channel string
-	url     *url.URL
+	channel db.NtfyChannel
 	sent    []time.Time
 }
 
@@ -37,13 +36,10 @@ func New(o Options) (Alert, error) {
 
 	a := Alert{}
 
-	err := a.SetChannel(o.Channel)
-	if err != nil {
-		return a, fmt.Errorf("alert.SetChannel() failed: %w", err)
-	}
-
 	a.Title = o.Title
 	a.Body = o.Body
+
+	a.channel = o.Channel
 
 	a.Prio = PrioDefault
 	if o.Prio != 0 {
@@ -59,7 +55,7 @@ func Send(a *Alert) error {
 
 	req, err := http.NewRequest(
 		"POST",
-		a.url.String(),
+		a.channel.Url,
 		strings.NewReader(a.Body),
 	)
 
@@ -77,30 +73,6 @@ func Send(a *Alert) error {
 	}
 
 	a.sent = append(a.sent, time.Now())
-
-	return nil
-}
-
-// ---------------------------------------------------------------------------
-
-func (a *Alert) SetChannel(c string) error {
-
-	ntfy_server := "https://msg.irc.ugent.be:1443"
-
-	if c == "" {
-		return fmt.Errorf("unable to create url.URL from ntfy_server(%s) + channel(%s): channel can not be empty", ntfy_server, c)
-	}
-
-	url_str := ntfy_server + "/" + c
-
-	url, err := url.Parse(url_str)
-	if err != nil {
-
-		return fmt.Errorf("unable to create url.URL from ntfy_server(%s) + channel(%s): %w", ntfy_server, c, err)
-	}
-
-	a.channel = c
-	a.url = url
 
 	return nil
 }

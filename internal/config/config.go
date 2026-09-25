@@ -131,7 +131,7 @@ func (nc *NtfyConfig) Init() {
 
 func (nc *NtfyConfig) Boot() {
 
-	url, err := url.Parse(nc.ServerUrlStr)
+	url, err := url.ParseRequestURI(nc.ServerUrlStr)
 
 	if err != nil {
 		log.Fatalf("config.Ntfy.Boot() failed: unable to parse url --ntfy.server-url='%s' : %s", nc.ServerUrlStr, err)
