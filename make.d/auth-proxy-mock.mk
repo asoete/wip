@@ -34,7 +34,8 @@ apm.start-server.usage.current-config:
 		echo ; \
 		printf "current config: \n" ; \
 		printf "\t make apm.start-server APM.LISTEN_ADDR=$(APM.LISTEN_ADDR) WIP.ADDRESS=$(WIP.ADDRESS) \\ \n" ; \
-		printf "\t\t APM.USERNAME=$(APM.USERNAME) APM.REMOTE_USER=$(APM.REMOTE_USER) \n" ; \
+		printf "\t\t APM.USERNAME=$(APM.USERNAME) APM.REMOTE_USER=$(APM.REMOTE_USER) \\ \n" ; \
+		printf "\t\t APM.GROUPS=$(APM.GROUPS) \n" ; \
 		echo ; \
 	} | $(COLORIZE)
 
@@ -44,8 +45,9 @@ apm.start-server.usage.options:
 		printf ' \t --- \t --- \t --- \t --- \t\n' ; \
 		printf ' \t `APM.LISTEN_ADDR` \t `$(APM.LISTEN_ADDR)` \t `auth-proxy-mock --listen-on=...` \t Accept requests on this address \t\n' ; \
 		printf ' \t `WIP.ADDRESS` \t `$(WIP.ADDRESS)` \t `auth-proxy-mock --forward-to=...` \t Forward requests to this WiP service instance \t\n' ; \
-		printf ' \t `APM.USERNAME` \t `$$USER` \t `auth-proxy-mock --remote-user=...` \t Inject this remote user in the HTTP request (header) \t\n' ; \
-		printf ' \t `APM.REMOTE_USER` \t `<md5sum($$USER) | as-uuid>` \t `auth-proxy-mock --sso-sub=...` \t Inject this sso sub in the HTTP request (header) \t\n' ; \
+		printf ' \t `APM.REMOTE_USER` \t `<md5sum($$USER) | as-uuid>` \t `auth-proxy-mock --header "REMOTE_USER:..."` \t Inject this sso sub in the HTTP request (header) \t\n' ; \
+		printf ' \t `APM.USERNAME` \t `$$USER` \t `auth-proxy-mock --header="OIDC_CLAIM_preferred_username:..."` \t Inject this remote user in the HTTP request (header) \t\n' ; \
+		printf ' \t `APM.GROUPS` \t `group1,group2,...` \t `auth-proxy-mock --header="OIDC_CLAIM_memberOf:..."` \t Inject this comma seperated group list in the HTTP request (header) \t\n' ; \
 	} | column -t -s $$'\t' -o '|' | $(COLORIZE)
 
 .PHONY: apm.docs
