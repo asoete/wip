@@ -3,8 +3,6 @@
 * add transactions
   <https://docs.sqlc.dev/en/latest/howto/transactions.html>
 
-* UNIQUE ntfy_channel.name
-
 # FEATURES / IMPROVEMENTS
 
 * eventlog
