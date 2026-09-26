@@ -2,12 +2,16 @@ package abort
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"runtime"
 	"strings"
+
+	"modernc.org/sqlite"
+	"modernc.org/sqlite/lib"
 )
 
 func New(args ...any) Aborter {
@@ -89,15 +93,26 @@ func (a *Aborter) DbError(w http.ResponseWriter, err error, args ...any) {
 		msg = args[0]
 		args = args[1:]
 	} else {
-		msg = "no such item"
+		msg = "database error"
 	}
 
 	args = append([]any{msg}, args...)
 	args = append(args, "error", err)
 
 	if err == sql.ErrNoRows {
-		a.Fatal(w, http.StatusNotFound, args...)
+		a.fatal(w, http.StatusNotFound, args...)
 		return
+	}
+
+	var sqliteErr *sqlite.Error
+	if errors.As(err, &sqliteErr) {
+
+		if sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE {
+			fmt.Printf("%+v", sqliteErr)
+			args[0] = "UNIQUE constraint violated"
+			a.fatal(w, http.StatusConflict, args...)
+			return
+		}
 	}
 
 	a.fatal(w, http.StatusInternalServerError, args...)
