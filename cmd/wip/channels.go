@@ -106,7 +106,7 @@ func newChannelHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		abrt.DbError(w, err, "unable to list channels")
+		abrt.DbError(w, err, "unable to create channel")
 	}
 
 	http.Redirect(w, r, "/channels", http.StatusSeeOther)
