@@ -15,6 +15,8 @@ import (
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/config"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
 var ctlMux = http.NewServeMux()
@@ -96,14 +98,19 @@ func main() {
 
 	dispatch.Boot(dbRW)
 
+	event.SetDefault(event.New(dbRW))
+	go event.Log(event.AppStart, user.System, nil)
+
 	// Start (separate) server to listen for control commands
 	go func() {
 		slog.Info("[CTL] start control service", "--ctl.address", APP.Ctl.Address)
 		slog.Debug("[CTL]", "X-WiP-Ctl-Token", tokenMuxToken)
-		log.Fatal(http.ListenAndServe(APP.Ctl.Address, &tokenMux{ctlMux}))
+		slog.Error("[CTL] server stopped", "error", http.ListenAndServe(APP.Ctl.Address, &tokenMux{ctlMux}))
 	}()
 
 	// Start main webserver
 	slog.Info("[WEB] start web service", "--web.address", APP.Web.Address)
-	log.Fatal(http.ListenAndServe(APP.Web.Address, nil))
+	slog.Error("[WEB] server stopped", "error", http.ListenAndServe(APP.Web.Address, nil))
+
+	go event.Log(event.AppStop, user.System, nil)
 }

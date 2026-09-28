@@ -13,6 +13,7 @@ import (
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
@@ -101,6 +102,7 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go event.Log(event.AlarmCreate, user, dbAlarm)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -152,6 +154,7 @@ func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go event.Log(event.AlarmCancel, user, dbAlarm)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -259,5 +262,6 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go event.Log(event.AlarmModify, user, alarm)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -9,6 +9,7 @@ import (
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
@@ -100,7 +101,7 @@ func newChannelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := context.Background()
-	_, err = dbRW.InsertChannel(ctx, db.InsertChannelParams{
+	ntfy_channel, err := dbRW.InsertChannel(ctx, db.InsertChannelParams{
 		Name: channel_name,
 		Url:  url.String(),
 	})
@@ -109,5 +110,6 @@ func newChannelHandler(w http.ResponseWriter, r *http.Request) {
 		abrt.DbError(w, err, "unable to create channel")
 	}
 
+	go event.Log(event.ChannelCreate, user, ntfy_channel)
 	http.Redirect(w, r, "/channels", http.StatusSeeOther)
 }

@@ -8,6 +8,12 @@ import (
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/config"
 )
 
+var System User = User{
+	Username:   "system",
+	RemoteUser: "system@localhost",
+	Groups:     []string{},
+}
+
 type User struct {
 	Username   string
 	RemoteUser string

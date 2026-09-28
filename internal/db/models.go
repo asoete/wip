@@ -20,6 +20,15 @@ type Alarm struct {
 	Description sql.NullString
 }
 
+type Eventlog struct {
+	EventlogID int64
+	Timestamp  string
+	User       string
+	Type       string
+	Subid      sql.NullInt64
+	Data       sql.NullString
+}
+
 type Migration struct {
 	MigrationID int64
 	File        string

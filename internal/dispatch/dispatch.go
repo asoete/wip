@@ -9,6 +9,8 @@ import (
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/alert"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
 type Dispatcher struct {
@@ -151,6 +153,7 @@ func (d *Dispatcher) createCountdown(alarm db.Alarm, alertInst *alert.Alert) err
 	callback := func() {
 		slog.Info("countdown callback called", "alertInst", alertInst)
 		alert.Send(alertInst)
+		go event.Log(event.AlertFire, user.System, alertInst)
 		d.createCountdown(alarm, alertInst)
 	}
 
