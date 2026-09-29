@@ -30,3 +30,28 @@ func ctlAlarmDispatchListAlarms(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, string(json))
 }
+
+// ----------------------------------------------------------------------------
+
+func init() {
+	ctlMux.HandleFunc("GET /ctl/dispatch/list-timers", ctlTimerDispatchListTimers)
+}
+
+func ctlTimerDispatchListTimers(w http.ResponseWriter, r *http.Request) {
+
+	var list []int64
+
+	for i, _ := range dispatch.GetTimers() {
+
+		list = append(list, i)
+	}
+
+	json, err := json.MarshalIndent(list, "", "  ")
+
+	if err != nil {
+		slog.Error("unable to Marshal dispatch.alarms", "error", err)
+		os.Exit(1)
+	}
+
+	fmt.Fprint(w, string(json))
+}
