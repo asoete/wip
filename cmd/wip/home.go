@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
 
@@ -43,13 +44,13 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	abrt.Append("user", user)
 
 	ctx := context.Background()
-	activeAlarms, err := dbRW.ListActiveUserAlarms(ctx, user.Username)
+	activeAlarms, err := db.ROQ.ListActiveUserAlarms(ctx, user.Username)
 	if err != nil {
 		abrt.DbError(w, err, "error retrieving active alarms")
 		return
 	}
 
-	cancelledAlarms, err := dbRW.ListCancelledUserAlarms(ctx, user.Username)
+	cancelledAlarms, err := db.ROQ.ListCancelledUserAlarms(ctx, user.Username)
 	if err != nil {
 		abrt.DbError(w, err, "error retrieving history")
 		return

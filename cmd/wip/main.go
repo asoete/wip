@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"log/slog"
 	"net/http"
@@ -21,10 +20,6 @@ import (
 
 var ctlMux = http.NewServeMux()
 var tokenMuxToken string
-
-// database handles
-var dbRO *db.Queries
-var dbRW *db.Queries
 
 var APP config.Application
 
@@ -88,17 +83,18 @@ func main() {
 		}
 	}
 
-	// init database handles
-	dbhandle, err := sql.Open("sqlite", APP.Db.Dsn)
+	err := db.BootRO(APP.Db.Dsn)
 	if err != nil {
-		log.Fatalf("unable to parse database(%s): %w", APP.Db.Dsn, err)
+		slog.Error("unable to bootstrap RO database", "dsn", APP.Db.Dsn, "error", err)
 	}
 
-	dbRW = db.New(dbhandle)
+	err = db.BootRW(APP.Db.Dsn)
+	if err != nil {
+		slog.Error("unable to bootstrap RW database", "dsn", APP.Db.Dsn, "error", err)
+	}
 
-	dispatch.Boot(dbRW)
+	dispatch.Boot()
 
-	event.SetDefault(event.New(dbRW))
 	go event.Log(event.AppStart, user.System, nil)
 
 	// Start (separate) server to listen for control commands

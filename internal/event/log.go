@@ -15,7 +15,7 @@ import (
 // FACADE
 // ============================================================================
 
-var defaultLogger *logger
+var defaultLogger *logger = &logger{}
 
 func SetDefault(l *logger) {
 	defaultLogger = l
@@ -31,14 +31,10 @@ func Log(ev EventType, u user.User, data any) {
 
 func New(dbi *db.Queries) *logger {
 
-	return &logger{
-		db: dbi,
-	}
+	return &logger{}
 }
 
-type logger struct {
-	db *db.Queries
-}
+type logger struct{}
 
 type EventType int
 
@@ -97,9 +93,7 @@ func (l *logger) Log(event_type EventType, u user.User, data any) {
 		str = string(bts)
 	}
 
-	ctx := context.Background()
-
-	err = l.db.InsertEvent(ctx, db.InsertEventParams{
+	eventParams := db.InsertEventParams{
 		User: u.Username,
 		Type: event_name,
 		Subid: sql.NullInt64{
@@ -110,7 +104,22 @@ func (l *logger) Log(event_type EventType, u user.User, data any) {
 			String: str,
 			Valid:  str != "",
 		},
-	})
+	}
+
+	ctx := context.Background()
+	tx, dbQ, err := db.StartTx()
+	if err != nil {
+		slog.Error("event.Log(): start db transaction failed", "error", err, "event_details", eventParams)
+		return
+	}
+	defer tx.Rollback()
+
+	err = dbQ.InsertEvent(ctx, eventParams)
+
+	err = tx.Commit()
+	if err != nil {
+		slog.Error("event.Log(): db transaction failed", "error", err, "event_details", eventParams)
+	}
 }
 
 func atoSubid(subject any) (int64, bool) {

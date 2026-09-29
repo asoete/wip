@@ -63,25 +63,33 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
 	var channel db.NtfyChannel
-	channel, err = dbRW.SelectChannel(ctx, channel_name)
+
+	channel, err = db.ROQ.SelectChannel(ctx, channel_name)
 
 	if err != nil && err != sql.ErrNoRows {
 		abrt.DbError(w, err, "invalid channel")
 		return
 	}
 
+	tx, dbQ, err := db.StartTx()
+	if err != nil {
+		abrt.DbError(w, err)
+		return
+	}
+	defer tx.Rollback()
+
 	if err == sql.ErrNoRows {
 		url, err := APP.Ntfy.SecretUrlFrom(channel_name)
 		if err != nil {
 			abrt.Error(w, err, "creating channel failed", "channel", channel)
 		}
-		channel, err = dbRW.InsertChannel(ctx, db.InsertChannelParams{
+		channel, err = dbQ.InsertChannel(ctx, db.InsertChannelParams{
 			Name: channel_name,
 			Url:  url.String(),
 		})
 	}
 
-	dbAlarm, err := dbRW.InsertAlarm(ctx, db.InsertAlarmParams{
+	dbAlarm, err := dbQ.InsertAlarm(ctx, db.InsertAlarmParams{
 		User:        user.Username,
 		Datetime:    deadline,
 		Description: sql.NullString{String: description, Valid: description != ""},
@@ -99,6 +107,12 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err = dispatch.Register(dbAlarm)
 	if err != nil {
 		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Register() failed")
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		abrt.DbError(w, err)
 		return
 	}
 
@@ -140,8 +154,16 @@ func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 
 	abrt.Append("alarm_id", alarm_id)
 
+	tx, dbQ, err := db.StartTx()
+	if err != nil {
+		abrt.DbError(w, err)
+		return
+	}
+	defer tx.Rollback()
+
 	ctx := context.Background()
-	dbAlarm, err := dbRW.CancelAlarm(ctx, alarm_id)
+
+	dbAlarm, err := dbQ.CancelAlarm(ctx, alarm_id)
 
 	if err != nil {
 		abrt.DbError(w, err, "alarm cancel failed")
@@ -151,6 +173,12 @@ func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 	err = dispatch.Cancel(dbAlarm)
 	if err != nil {
 		abrt.Error(w, err, "alarm cancel failed")
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		abrt.DbError(w, err)
 		return
 	}
 
@@ -227,7 +255,7 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 	abrt.Append("quickadd", duration)
 
 	ctx := context.Background()
-	alarm, err := dbRW.SelectAlarm(ctx, alarm_id)
+	alarm, err := db.ROQ.SelectAlarm(ctx, alarm_id)
 	if err != nil {
 		abrt.DbError(w, err, "no such alarm", "info", "fetch alarm from database failed")
 		return
@@ -246,7 +274,14 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf(">>>> %d\n", time.Duration(time.Minute*30))
 
-	alarm, err = dbRW.UpdateAlarmDeadline(ctx, db.UpdateAlarmDeadlineParams{
+	tx, dbQ, err := db.StartTx()
+	if err != nil {
+		abrt.DbError(w, err)
+		return
+	}
+	defer tx.Rollback()
+
+	alarm, err = dbQ.UpdateAlarmDeadline(ctx, db.UpdateAlarmDeadlineParams{
 		Deadline: sqlite.Time{Time: new_deadline},
 		AlarmID:  alarm_id,
 	})
@@ -259,6 +294,12 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 	err = dispatch.Register(alarm)
 	if err != nil {
 		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Register() failed")
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		abrt.DbError(w, err)
 		return
 	}
 

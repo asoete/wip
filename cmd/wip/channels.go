@@ -44,7 +44,7 @@ func channelsHandler(w http.ResponseWriter, r *http.Request) {
 	abrt.Append("user", user)
 
 	ctx := context.Background()
-	channels, err := dbRW.ListChannels(ctx)
+	channels, err := db.ROQ.ListChannels(ctx)
 	if err != nil {
 		abrt.DbError(w, err, "unable to list channels")
 	}
@@ -100,14 +100,28 @@ func newChannelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tx, dbQ, err := db.StartTx()
+	if err != nil {
+		abrt.DbError(w, err)
+		return
+	}
+	defer tx.Rollback()
+
 	ctx := context.Background()
-	ntfy_channel, err := dbRW.InsertChannel(ctx, db.InsertChannelParams{
+
+	ntfy_channel, err := dbQ.InsertChannel(ctx, db.InsertChannelParams{
 		Name: channel_name,
 		Url:  url.String(),
 	})
 
 	if err != nil {
 		abrt.DbError(w, err, "unable to create channel")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		abrt.DbError(w, err)
+		return
 	}
 
 	go event.Log(event.ChannelCreate, user, ntfy_channel)

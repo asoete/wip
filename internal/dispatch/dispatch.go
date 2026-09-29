@@ -14,8 +14,6 @@ import (
 )
 
 type Dispatcher struct {
-	dbRO   *db.Queries
-	dbRW   *db.Queries
 	alarms map[int64]*db.Alarm
 	timers map[int64]*time.Timer
 }
@@ -29,8 +27,8 @@ var defaultDispatcher Dispatcher = Dispatcher{
 // FACADES
 // ---------------------------------------------------------------------------
 
-func Boot(rw *db.Queries) error {
-	return defaultDispatcher.Boot(rw)
+func Boot() error {
+	return defaultDispatcher.Boot()
 }
 
 func Resume() error {
@@ -69,10 +67,8 @@ func GetTimers() map[int64]*time.Timer {
 // IMPLEMENTATION
 // ---------------------------------------------------------------------------
 
-func (d *Dispatcher) Boot(rwh *db.Queries) error {
+func (d *Dispatcher) Boot() error {
 
-	d.dbRO = rwh
-	d.dbRW = rwh
 	return d.Resume()
 }
 
@@ -81,7 +77,8 @@ func (d *Dispatcher) Boot(rwh *db.Queries) error {
 func (d *Dispatcher) Resume() error {
 
 	ctx := context.Background()
-	list, err := d.dbRO.ListActiveAlarms(ctx)
+	//list, err := d.dbRO.ListActiveAlarms(ctx)
+	list, err := db.ROQ.ListActiveAlarms(ctx)
 	if err != nil {
 		slog.Error("unable to boot dispatch: loading active alarms failed", "error", err)
 		os.Exit(2)
@@ -106,7 +103,7 @@ func (d *Dispatcher) Register(a db.Alarm) error {
 	d.alarms[a.AlarmID] = &a
 
 	ctx := context.Background()
-	channel, err := d.dbRO.SelectChannel(ctx, a.Channel)
+	channel, err := db.ROQ.SelectChannel(ctx, a.Channel)
 
 	if err != nil {
 		return fmt.Errorf("unable to select channel(%s): %w", a.Channel, err)

@@ -1,9 +1,6 @@
  BLOCKERS
 ===============================================================================
 
-* add transactions
-  <https://docs.sqlc.dev/en/latest/howto/transactions.html>
-
 * add RW mutex around dispatch.alarms and dispatch.timers
 
  FEATURES / IMPROVEMENTS
