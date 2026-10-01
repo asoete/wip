@@ -10,12 +10,11 @@ import (
 	"strconv"
 
 	_ "modernc.org/sqlite"
-	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/config"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
-	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/watchdog"
 )
 
 var ctlMux = http.NewServeMux()
@@ -74,7 +73,11 @@ func main() {
 		slog.Error("unable to bootstrap RW database", "dsn", APP.Db.Dsn, "error", err)
 	}
 
-	dispatch.Boot()
+	err = watchdog.Resume()
+	if err != nil {
+		slog.Error("watchdog.Resume() failed", "error", err)
+		os.Exit(3)
+	}
 
 	go event.Log(event.AppStart, user.System, nil)
 

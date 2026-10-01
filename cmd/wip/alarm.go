@@ -12,9 +12,9 @@ import (
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db/sqlite"
-	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/watchdog"
 )
 
 func init() {
@@ -104,7 +104,8 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 	//slog.Info("insert new timer", "result", res, "request", r)
 	slog.Info("DB: new alarm inserted", "db.Alarm", dbAlarm)
 
-	err = dispatch.Register(dbAlarm)
+	watchdog.Register(watchdog.New(&dbAlarm, &channel, &user))
+
 	if err != nil {
 		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Register() failed")
 		return
@@ -170,7 +171,7 @@ func alarmCancelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dispatch.Cancel(dbAlarm)
+	err = watchdog.CancelAlarm(&dbAlarm)
 	if err != nil {
 		abrt.Error(w, err, "alarm cancel failed")
 		return
@@ -272,8 +273,6 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 	abrt.Append("old_deadline", old_deadline)
 	abrt.Append("new_deadline", new_deadline)
 
-	fmt.Printf(">>>> %d\n", time.Duration(time.Minute*30))
-
 	tx, dbQ, err := db.StartTx()
 	if err != nil {
 		abrt.DbError(w, err)
@@ -291,9 +290,9 @@ func alarmQuickaddHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dispatch.Register(alarm)
+	err = watchdog.UpdateAlarm(&alarm)
 	if err != nil {
-		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Register() failed")
+		abrt.Error(w, err, "deadline update failed", "info", "dispatch.Update() failed")
 		return
 	}
 

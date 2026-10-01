@@ -14,8 +14,8 @@ import (
 	"modernc.org/sqlite/lib"
 )
 
-func New(args ...any) Aborter {
-	return Aborter{tags: args}
+func New(args ...any) *Aborter {
+	return &Aborter{tags: args}
 }
 
 // ---------------------------------------------------------------------------

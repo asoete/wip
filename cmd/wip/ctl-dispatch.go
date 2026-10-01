@@ -10,46 +10,32 @@ import (
 	"net/http"
 	"os"
 
-	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/dispatch"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/watchdog"
 )
 
 // ----------------------------------------------------------------------------
 
 func init() {
-	ctlMux.HandleFunc("GET /ctl/dispatch/list-alarms", ctlAlarmDispatchListAlarms)
+	ctlMux.HandleFunc("GET /ctl/watchdog/list", ctlAlarmWatchdogListAlarms)
 }
 
-func ctlAlarmDispatchListAlarms(w http.ResponseWriter, r *http.Request) {
+func ctlAlarmWatchdogListAlarms(w http.ResponseWriter, r *http.Request) {
 
-	json, err := json.MarshalIndent(dispatch.GetAlarms(), "", "  ")
+	printable := make(map[int64]any)
+	for i, w := range watchdog.GetWatchers() {
+		printable[i] = map[string]any{
+			"Alarm":   w.Alarm,
+			"Channel": w.Channel,
+			"Countdown": map[string]any{
+				"Timer":    "<time.AfterFunc>",
+				"Deadline": w.Timer.Deadline,
+			},
+		}
+	}
+	json, err := json.MarshalIndent(printable, "", "  ")
 
 	if err != nil {
-		slog.Error("unable to Marshal dispatch.alarms", "error", err)
-		os.Exit(1)
-	}
-
-	fmt.Fprint(w, string(json))
-}
-
-// ----------------------------------------------------------------------------
-
-func init() {
-	ctlMux.HandleFunc("GET /ctl/dispatch/list-timers", ctlTimerDispatchListTimers)
-}
-
-func ctlTimerDispatchListTimers(w http.ResponseWriter, r *http.Request) {
-
-	var list []int64
-
-	for i, _ := range dispatch.GetTimers() {
-
-		list = append(list, i)
-	}
-
-	json, err := json.MarshalIndent(list, "", "  ")
-
-	if err != nil {
-		slog.Error("unable to Marshal dispatch.alarms", "error", err)
+		slog.Error("unable to Marshal watchdog.alarms", "error", err)
 		os.Exit(1)
 	}
 

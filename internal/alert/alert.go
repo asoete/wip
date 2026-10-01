@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 )
@@ -20,42 +19,20 @@ const (
 )
 
 type Options struct {
+	AlarmID int64
 	Prio    Prio
 	Channel db.NtfyChannel
 	Title   string
 	Body    string
 }
 
-type Alert struct {
-	Options
-	channel db.NtfyChannel
-	sent    []time.Time
-}
-
-func New(o Options) (Alert, error) {
-
-	a := Alert{}
-
-	a.Title = o.Title
-	a.Body = o.Body
-
-	a.channel = o.Channel
-
-	a.Prio = PrioDefault
-	if o.Prio != 0 {
-		a.Prio = o.Prio
-	}
-
-	return a, nil
-}
-
-func Send(a *Alert) error {
+func Send(a Options) error {
 
 	// err := alarm.Hydrate()
 
 	req, err := http.NewRequest(
 		"POST",
-		a.channel.Url,
+		a.Channel.Url,
 		strings.NewReader(a.Body),
 	)
 
@@ -72,26 +49,5 @@ func Send(a *Alert) error {
 		return fmt.Errorf("alert.Send(): POSTing alert to NTFY failed: %w", err)
 	}
 
-	a.sent = append(a.sent, time.Now())
-
 	return nil
-}
-
-// ---------------------------------------------------------------------------
-
-func (a *Alert) Sent() []time.Time {
-
-	return a.sent
-}
-
-// ---------------------------------------------------------------------------
-
-// Time To Reminder
-func (a *Alert) TTR() (time.Duration, error) {
-
-	if len(a.sent) == 0 {
-		return time.Duration(0), fmt.Errorf("we should not be calling TTR (Time To next Reminder) when the alert was never sent before")
-	}
-
-	return time.Until(a.sent[len(a.sent)-1].Add(time.Minute * 5)), nil
 }
