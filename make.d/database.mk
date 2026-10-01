@@ -35,7 +35,10 @@ db.delete:
 
 .PHONY: db.delete.no-confirm
 db.delete.no-confirm:
-		rm -f $(if $(DEBUG),-v) $(DB.SQLITE_FILE)
+		rm -f $(if $(DEBUG),-v) \
+			$(DB.SQLITE_FILE) \
+			$(DB.SQLITE_FILE).wal \
+			$(DB.SQLITE_FILE)-shm
 
 # .PHONY: rpm.migrations
 # rpm.migrations: rpm/migrate.sh
