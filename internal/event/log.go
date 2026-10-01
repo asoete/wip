@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/alert"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
 )
@@ -125,10 +126,18 @@ func (l *logger) Log(event_type EventType, u user.User, data any) {
 func atoSubid(subject any) (int64, bool) {
 
 	switch x := subject.(type) {
+	case *db.Alarm:
+		return x.AlarmID, true
 	case db.Alarm:
 		return x.AlarmID, true
 	case db.NtfyChannel:
 		return x.ChannelID, true
+	case *db.NtfyChannel:
+		return x.ChannelID, true
+	case alert.Options:
+		return x.AlarmID, true
+	case *alert.Options:
+		return x.AlarmID, true
 	}
 
 	return 0, false
