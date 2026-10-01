@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/alert"
+	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/config"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
@@ -59,7 +60,7 @@ func (watchdog *Watchdog) createNewCountdownTimer(deadline time.Time) *Timer {
 
 	callback := func() {
 		watchdog.alert()
-		watchdog.delayCountdownTimer(time.Duration(time.Second * 5))
+		watchdog.delayCountdownTimer(config.Ntfy.AlertDelay)
 	}
 
 	duration := time.Until(deadline)

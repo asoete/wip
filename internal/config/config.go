@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"time"
 )
 
 var Web *WebConfig
+var Ntfy *NtfyConfig
 
 // APP.Web.Address()
 type Application struct {
@@ -39,7 +41,6 @@ func (a *Application) Boot() {
 	flag.Parse()
 
 	a.Web.Boot()
-	Web = &a.Web // Hacky as heck
 	a.Ctl.Boot()
 	a.Db.Boot()
 	a.Ntfy.Boot()
@@ -77,7 +78,11 @@ func (wc *WebConfig) Init() {
 
 // ----------------------------------------------------------------------------
 
-func (wc *WebConfig) Boot() {}
+func (wc *WebConfig) Boot() {
+
+	// Expose as global :-/
+	Web = wc
+}
 
 // ============================================================================
 
@@ -119,17 +124,28 @@ func (dc *DbConfig) Boot() {}
 type NtfyConfig struct {
 	ServerUrlStr string
 	serverUrl    *url.URL
+	AlertDelay   time.Duration
 }
 
 // ----------------------------------------------------------------------------
 
 func (nc *NtfyConfig) Init() {
 	flag.StringVar(&nc.ServerUrlStr, "ntfy.server-url", "https://ntfy.sh", "NTFY.sh server `url`")
+
+	nc.AlertDelay = time.Duration(time.Minute * 5)
+	flag.Func("ntfy.alert-delay", "the `delay` between successive notification reminders", func(input string) error {
+		dur, err := time.ParseDuration(input)
+		nc.AlertDelay = dur
+		return err
+	})
 }
 
 // ----------------------------------------------------------------------------
 
 func (nc *NtfyConfig) Boot() {
+
+	// expose as global
+	Ntfy = nc
 
 	url, err := url.ParseRequestURI(nc.ServerUrlStr)
 
