@@ -71,6 +71,11 @@ func alarmCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err == sql.ErrNoRows {
+		abrt.InputError(w, err, "invalid channel specified", "info", "channel not found in database", "error", err)
+		return
+	}
+
 	tx, dbQ, err := db.StartTx()
 	if err != nil {
 		abrt.DbError(w, err)
