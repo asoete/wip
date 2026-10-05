@@ -23,7 +23,6 @@ endef
 tests.newdb: db.delete.no-confirm db tests.newdb.seed
 
 tests.newdb.seed.sources := $(shell find t/db/seeds -iname '*.sql')
-$(warning $(tests.newdb.seed.sources))
 tests.newdb.seed:
 	VERBOSITY="$(if $(DEBUG),$(DEBUG),0)" \
 		DB_FILE="$(DB.SQLITE_FILE)" \
