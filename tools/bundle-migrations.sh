@@ -175,7 +175,24 @@ function gen_usage() {
 
 	cat <<'EOF'
 function usage() {
-	echo TODO
+	cat <<'EOUSAGE'
+USAGE:
+	migrate.sh <file:db.sqlite>
+
+DESCRITPION:
+	Apply all /Work in Peace/ bundled migrations to the specified SQLite
+	database.
+	Previously applied migrations will be skipped and only the new
+	migrations will be applied (based on the `migrations` table inside the
+	SQLite database).
+
+EXAMPLE:
+	$ sh dist/migrate.sh data/work-in-peace.sqlite
+	sql/schema/20260825145000_create-table-migrations.sql           [  DONE  ] 2026-10-01 11:05:23
+	sql/schema/20260825145205_create-table-alarms.sql               [  DONE  ] 2026-10-01 11:05:23
+	sql/schema/20260825145411_create-table-ntfy_channels.sql        [  DONE  ] 2026-10-01 11:05:23
+	sql/schema/20260926144043-create-table-eventlog.sql             [  DONE  ] 2026-10-01 11:05:23
+EOUSAGE
 }
 
 EOF

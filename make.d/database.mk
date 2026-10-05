@@ -40,20 +40,21 @@ db.delete.no-confirm:
 			$(DB.SQLITE_FILE).wal \
 			$(DB.SQLITE_FILE)-shm
 
-# .PHONY: rpm.migrations
-# rpm.migrations: rpm/migrate.sh
-
 # ============================================================================
 # DIST MIGTATION
 # ============================================================================
 
-rpm/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | rpm
+.PHONY: dist
+dist: \
+	dist/migrate.sh
+
+dist/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | dist/
 	tools/bundle-migrations.sh \
 		$(DB.SCHEMA_SOURCES) \
 		> $@
 
-rpm:
-	mkdir rpm
+dist/:
+	mkdir $@
 
 # ============================================================================
 # SQLC CODEGEN
