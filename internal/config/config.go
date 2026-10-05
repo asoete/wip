@@ -112,7 +112,7 @@ type DbConfig struct {
 // ----------------------------------------------------------------------------
 
 func (dc *DbConfig) Init() {
-	flag.StringVar(&dc.Dsn, "db.dsn", "sqlite::memory:", "connect to this `dsn`")
+	flag.StringVar(&dc.Dsn, "db.dsn", ":memory:", "connect to this `dsn`")
 }
 
 // ----------------------------------------------------------------------------
