@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	embedder "vsc.irc.ugent.be/itsupport/work-in-peace/assets"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/event"
@@ -23,11 +24,11 @@ func init() {
 	http.HandleFunc("GET /channels", channelsHandler)
 
 	// register templates
-	channelsPage = template.Must(template.ParseFiles(
-		"assets/templates/layouts/default.html",
-		"assets/templates/pages/channels.html",
-		"assets/templates/components/page/header.html",
-		"assets/templates/icons.html",
+	channelsPage = template.Must(template.ParseFS(embedder.Templates,
+		"templates/layouts/default.html",
+		"templates/pages/channels.html",
+		"templates/components/page/header.html",
+		"templates/icons.html",
 	))
 }
 

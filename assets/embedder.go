@@ -9,3 +9,6 @@ var Fonts embed.FS
 
 //go:embed images/*
 var Images embed.FS
+
+//go:embed templates/*
+var Templates embed.FS

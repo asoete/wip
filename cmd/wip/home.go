@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	embedder "vsc.irc.ugent.be/itsupport/work-in-peace/assets"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/abort"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/user"
@@ -22,12 +23,12 @@ func init() {
 	http.HandleFunc("GET /{$}", homeHandler)
 
 	// register templates
-	homePage = template.Must(template.ParseFiles(
-		"assets/templates/layouts/default.html",
-		"assets/templates/pages/home.html",
-		"assets/templates/components/alarm/card.html",
-		"assets/templates/components/page/header.html",
-		"assets/templates/icons.html",
+	homePage = template.Must(template.ParseFS(embedder.Templates,
+		"templates/layouts/default.html",
+		"templates/pages/home.html",
+		"templates/components/alarm/card.html",
+		"templates/components/page/header.html",
+		"templates/icons.html",
 	))
 }
 
