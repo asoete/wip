@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"sync"
 
 	"vsc.irc.ugent.be/itsupport/work-in-peace/internal/db"
 )
@@ -40,6 +41,7 @@ func GetWatchers() map[int64]*Watchdog {
 // ===========================================================================
 
 type Repository struct {
+	mutex    sync.Mutex
 	watchers map[int64]*Watchdog
 }
 
@@ -80,6 +82,9 @@ func (repository *Repository) Resume() error {
 
 func (repository *Repository) Register(watchdog *Watchdog) error {
 
+	repository.mutex.Lock()
+	defer repository.mutex.Unlock()
+
 	repository.watchers[watchdog.Id()] = watchdog
 
 	watchdog.StartCountdown()
@@ -90,6 +95,9 @@ func (repository *Repository) Register(watchdog *Watchdog) error {
 // ---------------------------------------------------------------------------
 
 func (repository *Repository) UpdateAlarm(alarm *db.Alarm) error {
+
+	repository.mutex.Lock()
+	defer repository.mutex.Unlock()
 
 	watchdog, found := repository.watchers[alarm.AlarmID]
 	if !found {
@@ -107,6 +115,9 @@ func (repository *Repository) UpdateAlarm(alarm *db.Alarm) error {
 // ---------------------------------------------------------------------------
 
 func (repository *Repository) CancelAlarm(alarm *db.Alarm) error {
+
+	repository.mutex.Lock()
+	defer repository.mutex.Unlock()
 
 	watchdog, found := repository.watchers[alarm.AlarmID]
 	if !found {
@@ -132,6 +143,9 @@ func (repository *Repository) GetWatchdog(id int64) (*Watchdog, bool) {
 }
 
 func (repository *Repository) GetWatchers() map[int64]*Watchdog {
+
+	repository.mutex.Lock()
+	defer repository.mutex.Unlock()
 	return repository.watchers
 }
 
