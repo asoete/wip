@@ -46,6 +46,7 @@
 	</div>
 </form>
 
+<br>
 <h2>Active Alarms</h2>
 {{range $a := .alarms.active}}
 	{{template "component.alarm.card" $a }}
@@ -54,6 +55,7 @@
 No Active alarms
 </div>
 {{end}}
+<br>
 
 <h2>My Recent History</h2>
 <div class="" style="opacity: 0.8;">
