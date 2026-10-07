@@ -1,0 +1,12 @@
+[Unit]
+Description=Work in Peace service
+# After=nginx.service
+
+[Service]
+EnvironmentFile=-/usr/local/etc/work-in-peace/service.env
+ExecCondition=/usr/bin/test -n "${DB_FILE}"
+ExecStartPre=/usr/local/libexec/work-in-peace/migrate.sh ${DB_FILE}
+ExecStart=/usr/local/bin/work-in-peace "$OPTIONS"
+
+[Install]
+WantedBy=multi-user.target

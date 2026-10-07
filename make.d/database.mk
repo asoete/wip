@@ -41,22 +41,6 @@ db.delete.no-confirm:
 			$(DB.SQLITE_FILE)-shm
 
 # ============================================================================
-# DIST MIGTATION
-# ============================================================================
-
-.PHONY: dist
-dist: \
-	dist/migrate.sh
-
-dist/migrate.sh: $(DB.SCHEMA_SOURCES) tools/bundle-migrations.sh | dist/
-	tools/bundle-migrations.sh \
-		$(DB.SCHEMA_SOURCES) \
-		> $@
-
-dist/:
-	mkdir $@
-
-# ============================================================================
 # SQLC CODEGEN
 # ============================================================================
 
